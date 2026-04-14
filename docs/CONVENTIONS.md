@@ -46,7 +46,7 @@ Inherited from `data-project-manager` where applicable. All code — Opus or Son
 
 | What | Convention |
 |------|-----------|
-| Framework | Pico CSS from CDN — use its classless defaults |
+| Framework | Custom CSS design system in `static/css/style.css` — use CSS variables and component classes (`.card`, `.btn`, `.badge-*`) |
 | Custom styles | `static/css/style.css` — overrides only |
 | Class naming | Plain descriptive, no BEM, no utility classes | 
 | JS variables | camelCase (JS standard) |

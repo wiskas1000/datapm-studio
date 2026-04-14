@@ -257,7 +257,7 @@ Uses FTS5 via the existing search infrastructure. Results link to project detail
 |-----------|--------|--------|
 | Web framework | Flask | Known to user, mature, good for server-rendered HTML |
 | Interactivity | HTMX 2.x | Smart dropdowns and inline editing without JS framework |
-| CSS | Classless/minimal CSS framework (e.g., Pico CSS) | Good defaults, minimal effort, professional look |
+| CSS | Custom design system (adapted from Wagenwacht) | CSS variables, dark/light theme, DM Sans / DM Mono fonts |
 | Templates | Jinja2 (via Flask) | Standard, no extra dependency |
 | Database | Existing projects.db via repository layer | No new storage |
 | Python packaging | pyproject.toml with setuptools | Standard modern Python |
@@ -274,7 +274,7 @@ dependencies = [
 ]
 ```
 
-HTMX and Pico CSS are loaded from CDN in the base template (two `<script>`/`<link>` tags). No npm, no build step.
+HTMX is loaded from CDN and Google Fonts (DM Sans, DM Mono) are loaded from CDN in the base template. Custom CSS lives in `static/css/style.css`. No npm, no build step.
 
 ## What Studio Does NOT Do
 

@@ -3,15 +3,23 @@
 {% block title %}People — datapm studio{% endblock %}
 
 {% block content %}
-<h1>People</h1>
+<div class="page-header">
+  <div class="page-header-row">
+    <h1>People</h1>
+  </div>
+</div>
 
 {% if persons %}
-<ul>
-  {% for person in persons %}
-  <li>{{ person.first_name }} {{ person.last_name }}</li>
-  {% endfor %}
-</ul>
+<div class="card">
+  <ul>
+    {% for person in persons %}
+    <li>{{ person.first_name }} {{ person.last_name }}</li>
+    {% endfor %}
+  </ul>
+</div>
 {% else %}
-<p>No people recorded yet.</p>
+<div class="card card-empty">
+  <p>No people recorded yet.</p>
+</div>
 {% endif %}
 {% endblock %}
