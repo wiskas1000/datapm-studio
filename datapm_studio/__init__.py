@@ -1,3 +1,5 @@
 """datapm-studio: Web UI for datapm metadata management."""
 
-__version__ = "0.1.0"
+from __future__ import annotations
+
+__version__ = "0.0.1"

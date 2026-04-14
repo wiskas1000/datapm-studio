@@ -1,6 +1,8 @@
 """Project routes — list, create, detail, edit."""
 
-from flask import Blueprint, render_template, request, redirect, url_for
+from __future__ import annotations
+
+from flask import Blueprint, render_template, request
 
 bp = Blueprint("projects", __name__, url_prefix="/projects")
 
@@ -36,4 +38,4 @@ def detail(slug):
 def edit_field(slug, field):
     """Inline edit a single field (HTMX partial)."""
     # TODO: GET returns edit form partial, PUT saves and returns read partial
-    pass
+    return "", 501

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Project Detail — datapm studio{% endblock %}
+
+{% block content %}
+{% if project %}
+<h1>{{ project.title }}</h1>
+<p>Project detail view — coming soon.</p>
+{% else %}
+<h1>Project not found</h1>
+{% endif %}
+{% endblock %}

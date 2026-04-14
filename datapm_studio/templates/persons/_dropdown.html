@@ -1,0 +1,13 @@
+{% for person in persons %}
+<button type="button" class="dropdown-item">
+  {{ person.first_name }} {{ person.last_name }}
+</button>
+{% endfor %}
+{% if not persons and query %}
+<button type="button"
+        hx-get="{{ url_for('persons.new_inline') }}"
+        hx-target="#requestor-field"
+        class="dropdown-item">
+  + Add new person
+</button>
+{% endif %}

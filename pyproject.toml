@@ -22,6 +22,9 @@ dev = [
     "pyright>=1.1",
 ]
 
+[project.scripts]
+datapm-studio = "datapm_studio.app:main"
+
 [tool.setuptools.packages.find]
 include = ["datapm_studio*"]
 

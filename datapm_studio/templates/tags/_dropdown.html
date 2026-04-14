@@ -1,0 +1,10 @@
+{% for tag in tags %}
+<button type="button" class="dropdown-item tag-option">
+  {{ tag.name }}
+</button>
+{% endfor %}
+{% if not tags and query %}
+<button type="button" class="dropdown-item">
+  + Create "{{ query }}"
+</button>
+{% endif %}

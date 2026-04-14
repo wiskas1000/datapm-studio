@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Close-out — datapm studio{% endblock %}
+
+{% block content %}
+{% if project %}
+<h1>Close-out: {{ project.title }}</h1>
+
+{% if gaps %}
+<ul>
+  {% for gap in gaps %}
+  <li>
+    <strong>[{{ gap.severity }}]</strong> {{ gap.description }}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>All checks passed. Ready to close.</p>
+{% endif %}
+
+{% else %}
+<h1>Project not found</h1>
+{% endif %}
+{% endblock %}

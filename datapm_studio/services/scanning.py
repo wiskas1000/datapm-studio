@@ -1,5 +1,7 @@
 """Filesystem scanning — find files not registered in the database."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 
