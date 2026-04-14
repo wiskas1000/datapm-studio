@@ -3,22 +3,27 @@
 {% block title %}Close-out — datapm studio{% endblock %}
 
 {% block content %}
+<div class="page-header">
+  <div class="page-header-row">
+    <h1>{% if project %}Close-out: {{ project.title }}{% else %}Project not found{% endif %}</h1>
+  </div>
+</div>
+
 {% if project %}
-<h1>Close-out: {{ project.title }}</h1>
-
-{% if gaps %}
-<ul>
-  {% for gap in gaps %}
-  <li>
-    <strong>[{{ gap.severity }}]</strong> {{ gap.description }}
-  </li>
-  {% endfor %}
-</ul>
-{% else %}
-<p>All checks passed. Ready to close.</p>
-{% endif %}
-
-{% else %}
-<h1>Project not found</h1>
+  {% if gaps %}
+  <div class="card">
+    <ul>
+      {% for gap in gaps %}
+      <li>
+        <strong>[{{ gap.severity }}]</strong> {{ gap.description }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+  <div class="card card-empty">
+    <p>All checks passed. Ready to close.</p>
+  </div>
+  {% endif %}
 {% endif %}
 {% endblock %}

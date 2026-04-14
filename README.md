@@ -41,7 +41,7 @@ See [CLAUDE.md](CLAUDE.md) for Claude Code development instructions.
 
 - **Flask** — server-rendered HTML
 - **HTMX** — dynamic interactions without a JS framework
-- **Pico CSS** — classless CSS for clean defaults
+- **Custom CSS** — dark/light theme, DM Sans / DM Mono fonts
 - **SQLite** — shared `projects.db` via datapm's repository layer
 
 ## Development

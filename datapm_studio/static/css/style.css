@@ -1,1 +1,474 @@
-/* datapm-studio custom overrides — Pico CSS handles defaults */
+/* datapm-studio — Custom CSS adapted from Wagenwacht design system */
+
+/* ── Theme Variables ── */
+:root, [data-theme="dark"] {
+    --bg: #0f1115;
+    --bg-card: #1a1d24;
+    --bg-card-hover: #22262e;
+    --bg-surface: #14171c;
+    --border: #2a2e37;
+    --border-light: #363b46;
+    --text: #e8e9ec;
+    --text-muted: #8b8f9a;
+    --text-dim: #5c606b;
+    --accent: #5b9bd5;
+    --accent-dim: rgba(91, 155, 213, 0.15);
+    --accent-hover: #6db3f2;
+    --green: #4ade80;
+    --green-dim: rgba(74, 222, 128, 0.12);
+    --red: #f87171;
+    --red-dim: rgba(248, 113, 113, 0.12);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96, 165, 250, 0.12);
+    --orange: #fb923c;
+    --orange-dim: rgba(251, 146, 60, 0.12);
+    --radius: 8px;
+    --radius-lg: 12px;
+    color-scheme: dark;
+}
+
+[data-theme="light"] {
+    --bg: #f4f5f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f9fafb;
+    --bg-surface: #eef0f3;
+    --border: #d5d8de;
+    --border-light: #c0c4cc;
+    --text: #1a1d24;
+    --text-muted: #5c606b;
+    --text-dim: #8b8f9a;
+    --accent: #3a7cc0;
+    --accent-dim: rgba(58, 124, 192, 0.12);
+    --accent-hover: #2e6bab;
+    --green: #16a34a;
+    --green-dim: rgba(22, 163, 74, 0.1);
+    --red: #dc2626;
+    --red-dim: rgba(220, 38, 38, 0.08);
+    --blue: #2563eb;
+    --blue-dim: rgba(37, 99, 235, 0.08);
+    --orange: #ea580c;
+    --orange-dim: rgba(234, 88, 12, 0.08);
+    color-scheme: light;
+}
+
+/* ── Reset ── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+
+code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85em;
+    background: var(--bg-surface);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+}
+
+/* ── Navigation ── */
+nav {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-brand {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-left: 3rem;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* ── Main ── */
+main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ── Footer ── */
+footer {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+/* ── Typography ── */
+h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.25rem;
+}
+
+h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+p { margin-bottom: 0.75rem; }
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* ── Cards ── */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    transition: border-color 0.15s;
+}
+
+.card:hover {
+    border-color: var(--border-light);
+}
+
+.card + .card {
+    margin-top: 0.75rem;
+}
+
+.card-empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-muted);
+}
+
+/* ── Buttons ── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+}
+.btn-primary:hover { background: var(--accent-hover); color: #fff; }
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+    color: var(--text);
+    border-color: var(--border-light);
+}
+
+/* Native buttons and submit inputs without .btn class */
+button:not(.btn):not(.theme-toggle):not(.dropdown-item),
+input[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    transition: all 0.15s;
+}
+
+button:not(.btn):not(.theme-toggle):not(.dropdown-item):hover,
+input[type="submit"]:hover {
+    background: var(--accent-hover);
+}
+
+/* ── Badges ── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+}
+
+.badge-active { background: var(--green-dim); color: var(--green); }
+.badge-paused { background: var(--orange-dim); color: var(--orange); }
+.badge-done { background: var(--blue-dim); color: var(--blue); }
+.badge-archived { background: rgba(168, 162, 158, 0.15); color: #a8a29e; }
+
+/* ── Tables ── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+thead th {
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+tbody tr:hover {
+    background: var(--bg-card-hover);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ── Forms ── */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="date"],
+input[type="number"],
+input[type="url"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.875rem;
+    transition: border-color 0.15s;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+input[type="date"] {
+    color-scheme: inherit;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* ── Lists ── */
+ul, ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+li {
+    margin-bottom: 0.35rem;
+}
+
+/* ── Flash Messages ── */
+.flash {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.flash-success {
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.flash-error {
+    background: var(--red-dim);
+    color: var(--red);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.flash-warning {
+    background: var(--orange-dim);
+    color: var(--orange);
+    border: 1px solid rgba(251, 146, 60, 0.2);
+}
+
+.flash-info {
+    background: var(--blue-dim);
+    color: var(--blue);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+/* ── Dropdown (HTMX partials) ── */
+.dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.dropdown-item:hover {
+    background: var(--accent-dim);
+    color: var(--accent);
+}
+
+/* ── Stats ── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ── Theme toggle ── */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, border-color 0.15s;
+    width: 34px;
+    height: 34px;
+}
+.theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--border-light);
+}
+.theme-toggle svg { width: 18px; height: 18px; }
+
+[data-theme="light"] .icon-moon { display: none; }
+[data-theme="light"] .icon-sun { display: block; }
+:root .icon-sun, [data-theme="dark"] .icon-sun { display: none; }
+:root .icon-moon, [data-theme="dark"] .icon-moon { display: block; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    main { padding: 1rem; }
+    nav { padding: 0 1rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .nav-links { gap: 1rem; margin-left: 1.5rem; }
+}

@@ -3,22 +3,32 @@
 {% block title %}Search — datapm studio{% endblock %}
 
 {% block content %}
-<h1>Search</h1>
+<div class="page-header">
+  <div class="page-header-row">
+    <h1>Search</h1>
+  </div>
+</div>
 
-<form action="{{ url_for('search.search') }}" method="get">
-  <input type="search" name="q" value="{{ query }}" placeholder="Search projects...">
-  <button type="submit">Search</button>
-</form>
+<div class="card" style="margin-bottom: 1.5rem;">
+  <form action="{{ url_for('search.search') }}" method="get" style="display: flex; gap: 0.75rem;">
+    <input type="search" name="q" value="{{ query }}" placeholder="Search projects...">
+    <button type="submit">Search</button>
+  </form>
+</div>
 
 {% if query %}
   {% if results %}
-  <ul>
-    {% for result in results %}
-    <li><a href="{{ url_for('projects.detail', slug=result.slug) }}">{{ result.title }}</a></li>
-    {% endfor %}
-  </ul>
+  <div class="card">
+    <ul>
+      {% for result in results %}
+      <li><a href="{{ url_for('projects.detail', slug=result.slug) }}">{{ result.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
   {% else %}
-  <p>No results for "{{ query }}".</p>
+  <div class="card card-empty">
+    <p>No results for "{{ query }}".</p>
+  </div>
   {% endif %}
 {% endif %}
 {% endblock %}

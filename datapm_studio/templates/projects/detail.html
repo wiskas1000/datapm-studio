@@ -3,10 +3,14 @@
 {% block title %}Project Detail — datapm studio{% endblock %}
 
 {% block content %}
+<div class="page-header">
+  <div class="page-header-row">
+    <h1>{% if project %}{{ project.title }}{% else %}Project not found{% endif %}</h1>
+  </div>
+</div>
 {% if project %}
-<h1>{{ project.title }}</h1>
-<p>Project detail view — coming soon.</p>
-{% else %}
-<h1>Project not found</h1>
+<div class="card">
+  <p class="subtitle">Project detail view — coming soon.</p>
+</div>
 {% endif %}
 {% endblock %}

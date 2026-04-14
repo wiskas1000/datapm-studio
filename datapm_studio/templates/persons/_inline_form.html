@@ -1,5 +1,7 @@
 <form hx-post="{{ url_for('persons.new_inline') }}" hx-target="#requestor-field">
-  <input type="text" name="first_name" placeholder="First name" required>
-  <input type="text" name="last_name" placeholder="Last name" required>
-  <button type="submit">Add</button>
+  <div class="form-row">
+    <input type="text" name="first_name" placeholder="First name" required>
+    <input type="text" name="last_name" placeholder="Last name" required>
+  </div>
+  <button type="submit" class="btn btn-primary" style="margin-top: 0.75rem;">Add</button>
 </form>

@@ -38,7 +38,7 @@ datapm-studio is a local Flask + HTMX web UI for managing analytical project met
 | Python | ≥ 3.10 | |
 | Web framework | Flask ≥ 3.0 | Runtime dependency |
 | Frontend interactivity | HTMX 2.x | Loaded from CDN, no npm |
-| CSS | Pico CSS 2.x | Loaded from CDN, classless defaults |
+| CSS | Custom design system | DM Sans / DM Mono from Google Fonts CDN, dark/light theme toggle |
 | Templates | Jinja2 (via Flask) | No extra dependency |
 | Database | Existing projects.db | Via core's repository layer |
 | Testing | pytest | Dev dependency |
@@ -93,7 +93,7 @@ datapm-studio/
 │   │   ├── closeout.py      ← gap analysis logic
 │   │   └── scanning.py      ← find untracked files in project folders
 │   ├── templates/
-│   │   ├── base.html        ← layout, nav, HTMX + Pico CSS from CDN
+│   │   ├── base.html        ← layout, nav, HTMX + custom CSS, theme toggle
 │   │   ├── projects/
 │   │   │   ├── list.html
 │   │   │   ├── create.html  ← new project wizard

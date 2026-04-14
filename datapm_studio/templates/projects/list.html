@@ -3,30 +3,43 @@
 {% block title %}Projects — datapm studio{% endblock %}
 
 {% block content %}
-<h1>Projects</h1>
+<div class="page-header">
+  <div class="page-header-row">
+    <div>
+      <h1>Projects</h1>
+      <p class="subtitle">All analytical projects</p>
+    </div>
+    <a href="{{ url_for('projects.create_project') }}" class="btn btn-primary">+ New Project</a>
+  </div>
+</div>
 
 {% if projects %}
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Slug</th>
-      <th>Status</th>
-      <th>Created</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for project in projects %}
-    <tr>
-      <td><a href="{{ url_for('projects.detail', slug=project.slug) }}">{{ project.title }}</a></td>
-      <td><code>{{ project.slug }}</code></td>
-      <td>{{ project.status }}</td>
-      <td>{{ project.created_at }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Slug</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in projects %}
+      <tr>
+        <td><a href="{{ url_for('projects.detail', slug=project.slug) }}">{{ project.title }}</a></td>
+        <td><code>{{ project.slug }}</code></td>
+        <td>{{ project.status }}</td>
+        <td>{{ project.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% else %}
-<p>No projects yet. <a href="{{ url_for('projects.create_project') }}">Create one</a>.</p>
+<div class="card card-empty">
+  <p>No projects yet.</p>
+  <a href="{{ url_for('projects.create_project') }}" class="btn btn-primary">+ New Project</a>
+</div>
 {% endif %}
 {% endblock %}
