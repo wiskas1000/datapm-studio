@@ -39,16 +39,14 @@ It lives in a **separate repository** and **imports from `data_project_manager`*
 Studio uses the existing repository classes directly:
 
 ```python
-from data_project_manager.db.repositories import (
-    ProjectRepository,
-    PersonRepository,
-    TagRepository,
-    DataFileRepository,
-    DeliverableRepository,
-    QuestionRepository,
-    ChangeLogRepository,
-)
-from data_project_manager.db.database import get_connection
+from data_project_manager.db.repositories.project import ProjectRepository
+from data_project_manager.db.repositories.person import PersonRepository
+from data_project_manager.db.repositories.tag import TagRepository
+from data_project_manager.db.repositories.data_file import DataFileRepository
+from data_project_manager.db.repositories.deliverable import DeliverableRepository
+from data_project_manager.db.repositories.question import QuestionRepository
+from data_project_manager.db.repositories.changelog import ChangeLogRepository
+from data_project_manager.db.connection import get_connection
 ```
 
 It never writes raw SQL. All reads and writes go through the repository layer so that business rules (slug generation, SCD2 versioning, changelog entries) remain consistent whether metadata is entered via CLI, Python scripts, or Studio.

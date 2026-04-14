@@ -25,7 +25,7 @@ datapm-studio is a local Flask + HTMX web UI for managing analytical project met
 ## Relationship to data-project-manager
 
 - **Core repo**: the `data-project-manager` package (installed via pip/uv)
-- **What Studio imports**: `data_project_manager.db.repositories.*`, `data_project_manager.db.database.get_connection`, `data_project_manager.core.*` (project creation, slug generation, search)
+- **What Studio imports**: `data_project_manager.db.repositories.{entity}` (e.g., `.project.ProjectRepository`, `.person.PersonRepository`), `data_project_manager.db.connection.get_connection`, `data_project_manager.core.*` (project creation, slug generation, search)
 - **Boundary rule**: if the logic is about the data model, schema, or business rules (SCD2 versioning, slug generation, changelog entries), it belongs in the core. If it's about presenting forms, handling HTTP requests, or computing UI-specific views (gap analysis for close-out), it belongs in Studio.
 - **Database**: Studio reads/writes `~/.datapm/projects.db` — the same file the CLI uses. No separate database. Ever.
 - **Config**: Studio reads `~/.datapm/config.json`. Studio-specific settings go under a `"studio"` key if ever needed.

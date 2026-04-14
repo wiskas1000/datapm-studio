@@ -7,7 +7,7 @@ name = "datapm-studio"
 version = "0.1.0"
 description = "Web UI for datapm — form-based metadata management for analytical projects"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = [
     "data-project-manager",
@@ -24,3 +24,6 @@ dev = [
 
 [tool.setuptools.packages.find]
 include = ["datapm_studio*"]
+
+[tool.uv.sources]
+data-project-manager = { path = "../data-analysis-project-manager", editable = true }
