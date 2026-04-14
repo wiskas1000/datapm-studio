@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}datapm studio{% endblock %}</title>
+
+    <!-- Pico CSS — classless defaults -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+    <!-- Custom overrides -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="container">
+        <ul>
+            <li><strong>datapm studio</strong></li>
+        </ul>
+        <ul>
+            <li><a href="{{ url_for('projects.list_projects') }}">Projects</a></li>
+            <li><a href="{{ url_for('persons.list_persons') }}">People</a></li>
+            <li><a href="{{ url_for('search.search') }}">Search</a></li>
+            <li><a href="{{ url_for('projects.create_project') }}">+ New</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <article class="flash flash-{{ category }}">{{ message }}</article>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container">
+        <small>datapm studio v{{ config.get('version', '0.1.0') }} · local only · no data leaves this machine</small>
+    </footer>
+</body>
+</html>
