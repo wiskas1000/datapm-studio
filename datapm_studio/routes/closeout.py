@@ -1,5 +1,7 @@
 """Close-out routes — project completion checklist."""
 
+from __future__ import annotations
+
 from flask import Blueprint, render_template
 
 bp = Blueprint("closeout", __name__)

@@ -193,4 +193,4 @@ If the user pastes a Pyright diagnostic, fix the type error precisely — do not
 
 ## Current Phase
 
-**Design — no code yet.** We are finalizing the architecture and plan. Implementation has not started. The stub files in the repository are scaffolding only — they define structure, not working code.
+**Milestone 0 — scaffold + bootstrap.** We are implementing the initial Flask app scaffold, config reader, base template, and empty blueprints. The app should start and serve pages, but business logic is still stubbed.

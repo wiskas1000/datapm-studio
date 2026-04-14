@@ -1,5 +1,7 @@
 """Search routes — full-text search across projects."""
 
+from __future__ import annotations
+
 from flask import Blueprint, render_template, request
 
 bp = Blueprint("search", __name__, url_prefix="/search")

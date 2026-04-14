@@ -1,5 +1,7 @@
 """Tag routes — search dropdown, create inline."""
 
+from __future__ import annotations
+
 from flask import Blueprint, render_template, request
 
 bp = Blueprint("tags", __name__, url_prefix="/tags")
@@ -21,4 +23,4 @@ def search_tags():
 def new_inline():
     """HTMX endpoint: create a new tag on the fly and return it as a selected chip."""
     # TODO: TagRepository.create(name=request.form["name"])
-    pass
+    return "", 501

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Projects — datapm studio{% endblock %}
+
+{% block content %}
+<h1>Projects</h1>
+
+{% if projects %}
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Slug</th>
+      <th>Status</th>
+      <th>Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for project in projects %}
+    <tr>
+      <td><a href="{{ url_for('projects.detail', slug=project.slug) }}">{{ project.title }}</a></td>
+      <td><code>{{ project.slug }}</code></td>
+      <td>{{ project.status }}</td>
+      <td>{{ project.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No projects yet. <a href="{{ url_for('projects.create_project') }}">Create one</a>.</p>
+{% endif %}
+{% endblock %}

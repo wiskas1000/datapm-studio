@@ -1,5 +1,7 @@
 """Person routes — list, search dropdown, create inline."""
 
+from __future__ import annotations
+
 from flask import Blueprint, render_template, request
 
 bp = Blueprint("persons", __name__, url_prefix="/persons")

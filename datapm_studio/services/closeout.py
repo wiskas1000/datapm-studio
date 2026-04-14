@@ -1,5 +1,7 @@
 """Close-out gap analysis — finds missing metadata for a project."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 
