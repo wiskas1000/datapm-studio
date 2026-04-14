@@ -6,10 +6,11 @@ from dataclasses import dataclass
 @dataclass
 class Gap:
     """A single metadata gap found during close-out analysis."""
-    category: str        # e.g. "files", "people", "deliverables"
-    severity: str        # "required" or "recommended"
-    description: str     # human-readable explanation
-    fix_url: str         # relative URL to fix this gap (for HTMX links)
+
+    category: str  # e.g. "files", "people", "deliverables"
+    severity: str  # "required" or "recommended"
+    description: str  # human-readable explanation
+    fix_url: str  # relative URL to fix this gap (for HTMX links)
 
 
 def analyze_gaps(project, db_connection) -> list[Gap]:

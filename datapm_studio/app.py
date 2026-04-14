@@ -30,6 +30,7 @@ def create_app():
     @app.route("/")
     def index():
         from flask import redirect, url_for
+
         return redirect(url_for("projects.list_projects"))
 
     return app
