@@ -150,6 +150,7 @@ datapm-studio/
   How it was tested. Include commands run and results.
   ```
 - Update PLAN.md checkboxes when a milestone item is completed.
+- GitHub Project: #6
 
 ## Model Workflow
 
