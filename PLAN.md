@@ -20,13 +20,13 @@
 
 ### Acceptance Criteria
 
-- [ ] `uv run datapm-studio` starts a Flask dev server on localhost:5555
-- [ ] Visiting `/` redirects to `/projects`
-- [ ] `/projects` shows a list of projects from the database (title, slug, status, date)
-- [ ] `base.html` loads HTMX from CDN, custom CSS with dark/light theme toggle
-- [ ] Navigation works: Projects, People, Search, + New
-- [ ] `conftest.py` provides a Flask test client with a temporary SQLite DB
-- [ ] At least one route test passes
+- [x] `uv run datapm-studio` starts a Flask dev server on localhost:5555
+- [x] Visiting `/` redirects to `/projects`
+- [x] `/projects` shows a list of projects from the database (title, slug, status, date)
+- [x] `base.html` loads HTMX from CDN, custom CSS with dark/light theme toggle
+- [x] Navigation works: Projects, People, Search, + New
+- [x] `conftest.py` provides a Flask test client with a temporary SQLite DB
+- [x] At least one route test passes
 
 ### PR Breakdown
 
