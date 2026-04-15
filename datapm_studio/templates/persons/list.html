@@ -6,8 +6,14 @@
 <div class="page-header">
   <div class="page-header-row">
     <h1>People</h1>
+    <button class="btn btn-primary"
+            hx-get="{{ url_for('persons.new_page') }}"
+            hx-target="#person-form-area"
+            hx-swap="innerHTML">+ Add person</button>
   </div>
 </div>
+
+<div id="person-form-area"></div>
 
 {% if persons %}
 <div class="card">

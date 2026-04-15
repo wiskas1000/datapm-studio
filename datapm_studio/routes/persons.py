@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from data_project_manager.db.repositories.person import PersonRepository
 
@@ -80,3 +80,42 @@ def new_inline():
         return render_template("persons/_selected.html", person=person)
 
     return render_template("persons/_inline_form.html")
+
+
+@bp.route("/new", methods=["GET", "POST"])
+def new_page():
+    """Add a new person from the persons page.
+
+    GET returns a card with the form (HTMX partial).
+    POST creates the person and redirects to the persons list.
+    """
+    if request.method == "POST":
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        email = request.form.get("email", "").strip() or None
+        function_title = request.form.get("function_title", "").strip() or None
+        department = request.form.get("department", "").strip() or None
+
+        if not first_name or not last_name:
+            return render_template(
+                "persons/_page_form.html",
+                error="First and last name are required.",
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                function_title=function_title,
+                department=department,
+            )
+
+        repo = _get_repo()
+        repo.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            function_title=function_title,
+            department=department,
+        )
+        flash(f"Added {first_name} {last_name}.", "success")
+        return redirect(url_for("persons.list_persons"))
+
+    return render_template("persons/_page_form.html")
