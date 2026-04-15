@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from flask import Flask
 
 from data_project_manager.config.loader import load_config
 from data_project_manager.db.connection import get_connection
 
 
-def create_app() -> Flask:
-    """Create and configure the Flask application."""
+def create_app(*, db_path: str | Path | None = None) -> Flask:
+    """Create and configure the Flask application.
+
+    Args:
+        db_path: Override the database path. Used by tests to point at a
+            temporary SQLite file instead of the user's real database.
+    """
     app = Flask(__name__)
     app.secret_key = "datapm-studio-local-only"
 
@@ -21,7 +28,7 @@ def create_app() -> Flask:
         from flask import g
 
         if "db" not in g:
-            g.db = get_connection()
+            g.db = get_connection(db_path)
         return g.db
 
     app.get_db = get_db  # type: ignore[attr-defined]
