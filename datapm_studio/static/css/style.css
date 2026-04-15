@@ -347,6 +347,54 @@ input[type="date"] {
     gap: 1rem;
 }
 
+/* ── Form hints ── */
+.form-hint {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+}
+
+.form-hint-inline {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+/* ── Folder toggles ── */
+.folder-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.folder-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.1s;
+}
+
+.folder-toggle:hover {
+    background: var(--bg-surface);
+}
+
+.folder-toggle input[type="checkbox"] {
+    width: auto;
+    accent-color: var(--accent);
+}
+
+.folder-toggle-indent {
+    padding-left: 2rem;
+}
+
+.folder-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+}
+
 /* ── Lists ── */
 ul, ol {
     padding-left: 1.5rem;

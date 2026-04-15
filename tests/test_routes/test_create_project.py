@@ -16,14 +16,41 @@ from data_project_manager.db.repositories.tag import ProjectTagRepository, TagRe
 
 
 def test_create_form_renders(client):
-    """GET /projects/new returns 200 with the form fields."""
+    """GET /projects/new returns 200 with all form fields."""
     r = client.get("/projects/new")
     assert r.status_code == 200
     assert b'name="title"' in r.data
     assert b'name="project_type"' in r.data
     assert b'name="domain"' in r.data
     assert b'name="request_date"' in r.data
+    assert b'name="folders"' in r.data
+    assert b'name="do_git_init"' in r.data
+    assert b'name="external_url"' in r.data
     assert b"Create Project" in r.data
+
+
+def test_create_form_shows_archetypes(client):
+    """The form shows all built-in archetypes in the dropdown."""
+    r = client.get("/projects/new")
+    assert r.status_code == 200
+    assert b"Minimal" in r.data
+    assert b"Analysis" in r.data
+    assert b"Modeling" in r.data
+    assert b"Reporting" in r.data
+    assert b"Research" in r.data
+    assert b"Full" in r.data
+
+
+def test_create_form_shows_folder_toggles(client):
+    """The form shows toggleable checkboxes for optional folders."""
+    r = client.get("/projects/new")
+    assert r.status_code == 200
+    assert b'value="data"' in r.data
+    assert b'value="src"' in r.data
+    assert b'value="notebooks"' in r.data
+    assert b'value="queries"' in r.data
+    assert b'value="literatuur"' in r.data
+    assert b'value="resultaten"' in r.data
 
 
 def test_create_form_shows_roots(client, db_conn):
@@ -300,3 +327,93 @@ def test_create_only_end_date_is_valid(client, db_conn, tmp_path):
         follow_redirects=False,
     )
     assert r.status_code == 302
+
+
+def test_create_with_custom_folders(client, db_conn, tmp_path):
+    """Selected folders are passed to create_project and created on disk."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data=MultiDict(
+            [
+                ("title", "Folder Project"),
+                ("root_name", "test-root"),
+                ("folders", "data"),
+                ("folders", "resultaten"),
+            ]
+        ),
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+    # Verify folders were created on disk
+    import os
+
+    project_dirs = os.listdir(tmp_path / "projects")
+    assert len(project_dirs) == 1
+    project_dir = tmp_path / "projects" / project_dirs[0]
+    assert (project_dir / "data").is_dir()
+    assert (project_dir / "resultaten").is_dir()
+    # src should NOT exist (not selected)
+    assert not (project_dir / "src").exists()
+
+
+def test_create_with_git_init(client, db_conn, tmp_path):
+    """Git init checkbox creates a git repo in src/."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data=MultiDict(
+            [
+                ("title", "Git Project"),
+                ("root_name", "test-root"),
+                ("folders", "data"),
+                ("folders", "src"),
+                ("do_git_init", "1"),
+            ]
+        ),
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+    import os
+
+    project_dirs = os.listdir(tmp_path / "projects")
+    project_dir = tmp_path / "projects" / project_dirs[0]
+    assert (project_dir / "src" / ".git").is_dir()
+
+    # Verify has_git_repo is True in DB
+    proj_repo = ProjectRepository(db_conn)
+    project = proj_repo.list()[0]
+    assert project.has_git_repo is True
+
+
+def test_create_with_external_url(client, db_conn, tmp_path):
+    """External URL field is persisted on the project."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "URL Project",
+            "root_name": "test-root",
+            "external_url": "https://dev.azure.com/org/project",
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+    proj_repo = ProjectRepository(db_conn)
+    project = proj_repo.list()[0]
+    assert project.external_url == "https://dev.azure.com/org/project"
