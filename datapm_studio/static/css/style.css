@@ -435,10 +435,39 @@ li {
 
 .search-input-wrap {
     position: relative;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .search-input-wrap input {
-    border-radius: var(--radius) var(--radius) 0 0;
+    border-radius: var(--radius) 0 0 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.btn-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    padding: 0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: none;
+    border-radius: 0 var(--radius) 0 0;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: color 0.15s, background 0.15s;
+}
+
+.btn-dropdown-toggle:hover {
+    color: var(--text);
+    background: var(--bg-card-hover);
+}
+
+.search-input-wrap .dropdown-results {
+    flex-basis: 100%;
 }
 
 .search-input-wrap input:not(:focus) + .dropdown-results {

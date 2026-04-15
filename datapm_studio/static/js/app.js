@@ -23,6 +23,10 @@ function clearPerson() {
             ' hx-get="/persons/search" hx-trigger="keyup changed delay:300ms"' +
             ' hx-target="#requestor-results" hx-params="*"' +
             ' hx-vals=\'{"q": this.value}\' autocomplete="off">' +
+            '<button type="button" class="btn-dropdown-toggle"' +
+            ' hx-get="/persons/search?q="' +
+            ' hx-target="#requestor-results"' +
+            ' title="Show all">&#9662;</button>' +
             '<div id="requestor-results" class="dropdown-results"></div>' +
         '</div>';
     htmx.process(field);
