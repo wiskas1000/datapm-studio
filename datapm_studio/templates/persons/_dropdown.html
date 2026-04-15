@@ -9,7 +9,6 @@
   {% endif %}
 </button>
 {% endfor %}
-{% if not persons and query %}
 <button type="button"
         hx-get="{{ url_for('persons.new_inline') }}"
         hx-target="#requestor-field"
@@ -17,4 +16,3 @@
         class="dropdown-item dropdown-item-action">
   + Add new person
 </button>
-{% endif %}
