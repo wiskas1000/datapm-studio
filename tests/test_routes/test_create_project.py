@@ -244,6 +244,26 @@ def test_create_end_before_start_shows_error(client):
     assert b"end date cannot be before" in r.data
 
 
+def test_create_same_start_and_end_is_valid(client, db_conn, tmp_path):
+    """Expected start equal to expected end is allowed (same-day project)."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "Same Day Project",
+            "root_name": "test-root",
+            "expected_start": "2026-05-01",
+            "expected_end": "2026-05-01",
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+
 def test_create_only_start_date_is_valid(client, db_conn, tmp_path):
     """Providing only expected start (no end) is allowed."""
     root_repo = ProjectRootRepository(db_conn)
