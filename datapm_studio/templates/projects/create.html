@@ -10,12 +10,13 @@
 </div>
 
 <form method="post" action="{{ url_for('projects.create_project') }}">
+
+  {% if error %}
+  <div class="flash flash-error">{{ error }}</div>
+  {% endif %}
+
   <div class="card">
     <h2>Basics</h2>
-
-    {% if error %}
-    <div class="flash flash-error">{{ error }}</div>
-    {% endif %}
 
     <div class="form-group">
       <label for="title">Title *</label>
@@ -43,6 +44,64 @@
       <label for="description">Description</label>
       <textarea id="description" name="description" rows="3"
                 placeholder="Brief description of the project">{{ form.description or '' }}</textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Folder Structure</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="template_used">Archetype</label>
+        <select id="template_used" name="template_used" onchange="applyArchetype()">
+          {% for key, arch in archetypes %}
+          <option value="{{ key }}"
+                  data-folders="{{ arch.folders | join(',') }}"
+                  {{ 'selected' if (form.template_used or 'analysis') == key else '' }}>
+            {{ arch.label }}
+          </option>
+          {% endfor %}
+        </select>
+        <p class="form-hint" id="archetype-hint"></p>
+      </div>
+
+      <div class="form-group">
+        <label for="root_name">Project root</label>
+        <select id="root_name" name="root_name">
+          {% for root in roots %}
+          <option value="{{ root.name }}"
+                  {{ 'selected' if root.is_default else '' }}>
+            {{ root.name }} ({{ root.absolute_path }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Folders</label>
+      <p class="form-hint">Base folders (communicatie, documenten) are always created. Toggle optional folders below.</p>
+      <div class="folder-toggles">
+        {% for folder in optional_folders %}
+        <label class="folder-toggle {{ 'folder-toggle-indent' if folder in src_toggles else '' }}">
+          <input type="checkbox" name="folders" value="{{ folder }}"
+                 id="folder-{{ folder }}"
+                 {{ 'checked' if folder in selected_folders else '' }}
+                 onchange="handleFolderToggle('{{ folder }}')">
+          <span class="folder-name">{{ folder }}/{% if folder in subfolders %} <span class="form-hint-inline">({{ subfolders[folder] | join(', ') }})</span>{% endif %}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="folder-toggle" id="git-toggle">
+        <input type="checkbox" name="do_git_init" value="1"
+               id="git-init-checkbox"
+               {{ 'checked' if form.do_git_init else '' }}
+               {{ 'disabled' if 'src' not in selected_folders else '' }}>
+        <span class="folder-name">Initialise git in src/</span>
+      </label>
     </div>
   </div>
 
@@ -96,34 +155,7 @@
   </div>
 
   <div class="card">
-    <h2>Settings</h2>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="template_used">Template</label>
-        <select id="template_used" name="template_used">
-          {% for key, label in templates %}
-          <option value="{{ key }}" {{ 'selected' if (form.template_used or 'analysis') == key else '' }}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="root_name">Project root</label>
-        <select id="root_name" name="root_name">
-          {% for root in roots %}
-          <option value="{{ root.name }}"
-                  {{ 'selected' if root.is_default else '' }}>
-            {{ root.name }} ({{ root.absolute_path }})
-          </option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Dates</h2>
+    <h2>Dates &amp; Planning</h2>
 
     <div class="form-row">
       <div class="form-group">
@@ -153,6 +185,12 @@
                value="{{ form.expected_end or '' }}">
       </div>
     </div>
+
+    <div class="form-group">
+      <label for="external_url">External URL</label>
+      <input type="url" id="external_url" name="external_url"
+             value="{{ form.external_url or '' }}" placeholder="e.g. DevOps or Trello link">
+    </div>
   </div>
 
   <div class="form-actions">
@@ -162,4 +200,68 @@
 </form>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+/* ── Archetype → folder toggles ── */
+var SRC_TOGGLES = {{ src_toggles | tojson }};
+
+function applyArchetype() {
+    var sel = document.getElementById('template_used');
+    var opt = sel.options[sel.selectedIndex];
+    var folders = opt.getAttribute('data-folders');
+    var active = folders ? folders.split(',') : [];
+
+    document.querySelectorAll('input[name="folders"]').forEach(function(cb) {
+        cb.checked = active.indexOf(cb.value) !== -1;
+    });
+
+    updateGitToggle();
+    updateHint(opt);
+}
+
+function handleFolderToggle(folder) {
+    var cb = document.getElementById('folder-' + folder);
+    if (folder === 'src' && !cb.checked) {
+        /* src OFF → notebooks, queries OFF */
+        SRC_TOGGLES.forEach(function(child) {
+            var childCb = document.getElementById('folder-' + child);
+            if (childCb) childCb.checked = false;
+        });
+    }
+    if (SRC_TOGGLES.indexOf(folder) !== -1 && cb.checked) {
+        /* notebooks/queries ON → src ON */
+        var srcCb = document.getElementById('folder-src');
+        if (srcCb) srcCb.checked = true;
+    }
+    updateGitToggle();
+}
+
+function updateGitToggle() {
+    var srcCb = document.getElementById('folder-src');
+    var gitCb = document.getElementById('git-init-checkbox');
+    if (!srcCb || !gitCb) return;
+    if (!srcCb.checked) {
+        gitCb.checked = false;
+        gitCb.disabled = true;
+    } else {
+        gitCb.disabled = false;
+    }
+}
+
+function updateHint(opt) {
+    var hint = document.getElementById('archetype-hint');
+    if (!hint) return;
+    var folders = opt.getAttribute('data-folders');
+    if (!folders) {
+        hint.textContent = 'Base folders only';
+    } else {
+        hint.textContent = '+ ' + folders.replace(/,/g, ', ');
+    }
+}
+
+/* Init on page load */
+(function() {
+    var sel = document.getElementById('template_used');
+    if (sel) updateHint(sel.options[sel.selectedIndex]);
+})();
+</script>
 {% endblock %}

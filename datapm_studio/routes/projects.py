@@ -6,6 +6,12 @@ from datetime import date
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
+from data_project_manager.core.templates import (
+    BUILT_IN_ARCHETYPES,
+    OPTIONAL_FOLDERS,
+    SRC_TOGGLES,
+    SUBFOLDERS,
+)
 from data_project_manager.db.repositories.person import (
     PersonRepository,
     ProjectPersonRepository,
@@ -45,7 +51,21 @@ def _form_data() -> dict:
         "expected_start": request.form.get("expected_start", ""),
         "expected_end": request.form.get("expected_end", ""),
         "estimated_hours": request.form.get("estimated_hours", ""),
+        "external_url": request.form.get("external_url", "").strip(),
+        "do_git_init": bool(request.form.get("do_git_init")),
     }
+
+
+def _selected_folders(form: dict) -> list[str]:
+    """Get selected folders from form or archetype defaults."""
+    folders = request.form.getlist("folders")
+    if folders:
+        return folders
+    # Default: use archetype folders
+    archetype = BUILT_IN_ARCHETYPES.get(form.get("template_used", "analysis"))
+    if archetype:
+        return list(archetype.folders)
+    return []
 
 
 def _render_create_form(form: dict, error: str | None = None):
@@ -66,16 +86,19 @@ def _render_create_form(form: dict, error: str | None = None):
             if tag:
                 selected_tags.append(tag)
 
-    from data_project_manager.core.templates import BUILT_IN_ARCHETYPES
-
-    templates = [(key, arch.label) for key, arch in BUILT_IN_ARCHETYPES.items()]
+    archetypes = [(key, arch) for key, arch in BUILT_IN_ARCHETYPES.items()]
+    selected_folders = _selected_folders(form)
 
     return render_template(
         "projects/create.html",
         form=form,
         error=error,
         roots=roots,
-        templates=templates,
+        archetypes=archetypes,
+        optional_folders=OPTIONAL_FOLDERS,
+        src_toggles=SRC_TOGGLES,
+        subfolders=SUBFOLDERS,
+        selected_folders=selected_folders,
         today=date.today().isoformat(),
         selected_person=selected_person,
         selected_tags=selected_tags,
@@ -111,6 +134,9 @@ def create_project():
                 form, error="Expected end date cannot be before expected start date."
             )
 
+    # Resolve selected folders
+    selected_folders = request.form.getlist("folders")
+
     # Call the core create_project function
     from data_project_manager.core.project import (
         create_project as core_create_project,
@@ -132,6 +158,8 @@ def create_project():
                 float(form["estimated_hours"]) if form["estimated_hours"] else None
             ),
             template_used=form["template_used"],
+            optional_folders=selected_folders if selected_folders else None,
+            do_git_init=form["do_git_init"],
             db_path=current_app.config.get("DATAPM_DB_PATH"),
         )
     except FileExistsError:
@@ -145,6 +173,10 @@ def create_project():
     project_id = result["id"]
     slug = result["slug"]
     conn = _get_conn()
+
+    # Update external_url if provided (create_project doesn't accept it)
+    if form["external_url"]:
+        ProjectRepository(conn).update(project_id, external_url=form["external_url"])
 
     # Link requestor
     if form["requestor_id"]:
