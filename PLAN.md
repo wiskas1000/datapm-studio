@@ -45,10 +45,10 @@
 ### Acceptance Criteria
 
 - [ ] `/projects/new` shows a form with: title, type (ad-hoc/planned), domain, requestor (searchable dropdown), tags (multi-select), template, root, dates
-- [ ] Requestor dropdown searches existing persons (HTMX, 300ms debounce)
-- [ ] Requestor dropdown shows "add new person" when no match
-- [ ] "Add new person" opens an inline form (HTMX partial) — no page reload
-- [ ] Tags dropdown auto-completes from existing tags
+- [x] Requestor dropdown searches existing persons (HTMX, 300ms debounce)
+- [x] Requestor dropdown shows "add new person" when no match
+- [x] "Add new person" opens an inline form (HTMX partial) — no page reload
+- [x] Tags dropdown auto-completes from existing tags
 - [ ] On submit: project record created in DB, folder scaffolded on disk, requestor linked as ProjectPerson
 - [ ] Redirect to `/projects/<slug>` after creation
 - [ ] Validation: empty title shows error, slug collision shows error
