@@ -55,9 +55,28 @@ def new_inline():
     """HTMX endpoint: inline form to add a new person without leaving the page.
 
     GET returns the mini-form. POST creates the person and returns
-    the selected-person partial.
+    the selected-person partial so the new person is immediately selected.
     """
     if request.method == "POST":
-        # TODO: PersonRepository.create(...)
-        pass
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        email = request.form.get("email", "").strip() or None
+
+        if not first_name or not last_name:
+            return render_template(
+                "persons/_inline_form.html",
+                error="First and last name are required.",
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+            )
+
+        repo = _get_repo()
+        person = repo.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+        )
+        return render_template("persons/_selected.html", person=person)
+
     return render_template("persons/_inline_form.html")
