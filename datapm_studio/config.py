@@ -1,27 +1,10 @@
-"""Read datapm configuration from ~/.datapm/config.json."""
+"""Configuration — thin re-exports from data-project-manager core."""
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
+from data_project_manager.config.loader import (
+    get_db_path,
+    load_config as load_datapm_config,
+)
 
-
-def get_datapm_dir() -> Path:
-    """Return the datapm config directory."""
-    return Path.home() / ".datapm"
-
-
-def get_db_path() -> Path:
-    """Return the path to the datapm SQLite database."""
-    return get_datapm_dir() / "projects.db"
-
-
-def load_datapm_config() -> dict:
-    """Load and return the datapm config.json as a dict.
-
-    Returns an empty dict if the config file doesn't exist yet.
-    """
-    config_path = get_datapm_dir() / "config.json"
-    if config_path.exists():
-        return json.loads(config_path.read_text())
-    return {}
+__all__ = ["get_db_path", "load_datapm_config"]

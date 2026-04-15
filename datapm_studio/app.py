@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from flask import Flask
 
-from datapm_studio.config import load_datapm_config
+from data_project_manager.config.loader import load_config
+from data_project_manager.db.connection import get_connection
 
 
 def create_app() -> Flask:
@@ -13,8 +14,25 @@ def create_app() -> Flask:
     app.secret_key = "datapm-studio-local-only"
 
     # Load datapm config
-    datapm_config = load_datapm_config()
-    app.config["DATAPM"] = datapm_config
+    app.config["DATAPM"] = load_config()
+
+    def get_db():
+        """Return a database connection, cached on the app context."""
+        from flask import g
+
+        if "db" not in g:
+            g.db = get_connection()
+        return g.db
+
+    app.get_db = get_db  # type: ignore[attr-defined]
+
+    @app.teardown_appcontext
+    def close_db(exc):
+        from flask import g
+
+        db = g.pop("db", None)
+        if db is not None:
+            db.close()
 
     # Register blueprints
     from datapm_studio.routes.closeout import bp as closeout_bp
