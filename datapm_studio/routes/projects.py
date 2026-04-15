@@ -104,6 +104,13 @@ def create_project():
     if not form["title"]:
         return _render_create_form(form, error="Title is required.")
 
+    # Validate date ordering (only when both are provided)
+    if form["expected_start"] and form["expected_end"]:
+        if form["expected_end"] < form["expected_start"]:
+            return _render_create_form(
+                form, error="Expected end date cannot be before expected start date."
+            )
+
     # Call the core create_project function
     from data_project_manager.core.project import (
         create_project as core_create_project,

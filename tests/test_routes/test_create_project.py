@@ -228,3 +228,55 @@ def test_create_duplicate_folder_shows_error(client, db_conn, tmp_path):
     assert r.status_code == 200
     # Should show an error, not a redirect
     assert b"already exists" in r.data or b"error" in r.data.lower()
+
+
+def test_create_end_before_start_shows_error(client):
+    """Expected end before expected start re-renders with an error."""
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "Bad Dates",
+            "expected_start": "2026-05-15",
+            "expected_end": "2026-04-01",
+        },
+    )
+    assert r.status_code == 200
+    assert b"end date cannot be before" in r.data
+
+
+def test_create_only_start_date_is_valid(client, db_conn, tmp_path):
+    """Providing only expected start (no end) is allowed."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "Start Only",
+            "root_name": "test-root",
+            "expected_start": "2026-05-01",
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+
+def test_create_only_end_date_is_valid(client, db_conn, tmp_path):
+    """Providing only expected end (no start) is allowed."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "End Only",
+            "root_name": "test-root",
+            "expected_end": "2026-06-01",
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
