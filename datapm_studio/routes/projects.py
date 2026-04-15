@@ -66,11 +66,16 @@ def _render_create_form(form: dict, error: str | None = None):
             if tag:
                 selected_tags.append(tag)
 
+    from data_project_manager.core.templates import BUILT_IN_ARCHETYPES
+
+    templates = [(key, arch.label) for key, arch in BUILT_IN_ARCHETYPES.items()]
+
     return render_template(
         "projects/create.html",
         form=form,
         error=error,
         roots=roots,
+        templates=templates,
         today=date.today().isoformat(),
         selected_person=selected_person,
         selected_tags=selected_tags,

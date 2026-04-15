@@ -102,7 +102,9 @@
       <div class="form-group">
         <label for="template_used">Template</label>
         <select id="template_used" name="template_used">
-          <option value="analysis" {{ 'selected' if (form.template_used or 'analysis') == 'analysis' else '' }}>Analysis</option>
+          {% for key, label in templates %}
+          <option value="{{ key }}" {{ 'selected' if (form.template_used or 'analysis') == key else '' }}>{{ label }}</option>
+          {% endfor %}
         </select>
       </div>
 
