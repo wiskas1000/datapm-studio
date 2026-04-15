@@ -11,11 +11,26 @@
 
 {% if persons %}
 <div class="card">
-  <ul>
-    {% for person in persons %}
-    <li>{{ person.first_name }} {{ person.last_name }}</li>
-    {% endfor %}
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Function</th>
+        <th>Department</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for person in persons %}
+      <tr>
+        <td>{{ person.first_name }} {{ person.last_name }}</td>
+        <td>{{ person.email or '—' }}</td>
+        <td>{{ person.function_title or '—' }}</td>
+        <td>{{ person.department or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% else %}
 <div class="card card-empty">
