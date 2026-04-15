@@ -37,8 +37,6 @@ def test_project_list_shows_status_badge(client, db_conn):
 
 
 def test_project_detail_not_found(client):
-    """Requesting a non-existent project slug returns 404 or handles gracefully."""
+    """Requesting a non-existent project slug returns 404."""
     r = client.get("/projects/nonexistent-slug")
-    # The route currently renders the template with project=None
-    # which is acceptable for the scaffold phase
-    assert r.status_code in (200, 404)
+    assert r.status_code == 404

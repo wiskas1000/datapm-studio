@@ -170,7 +170,31 @@ def detail(slug):
     """Show all metadata for a single project."""
     repo = _get_repo()
     project = repo.get_by_slug(slug)
-    return render_template("projects/detail.html", project=project)
+    if project is None:
+        from flask import abort
+
+        abort(404)
+
+    conn = _get_conn()
+
+    # Fetch linked persons (requestor, etc.)
+    persons = ProjectPersonRepository(conn).list_for_project(project.id)
+
+    # Fetch linked tags
+    tags = ProjectTagRepository(conn).list_for_project(project.id)
+
+    # Fetch project root name
+    root = None
+    if project.root_id:
+        root = ProjectRootRepository(conn).get(project.root_id)
+
+    return render_template(
+        "projects/detail.html",
+        project=project,
+        persons=persons,
+        tags=tags,
+        root=root,
+    )
 
 
 @bp.route("/<slug>/edit/<field>", methods=["GET", "PUT"])
