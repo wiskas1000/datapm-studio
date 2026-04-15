@@ -23,6 +23,10 @@ def create_app(*, db_path: str | Path | None = None) -> Flask:
     # Load datapm config
     app.config["DATAPM"] = load_config()
 
+    # Store DB path so routes can pass it to core functions that open
+    # their own connections (e.g. create_project).
+    app.config["DATAPM_DB_PATH"] = db_path
+
     def get_db():
         """Return a database connection, cached on the app context."""
         from flask import g

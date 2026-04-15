@@ -506,6 +506,13 @@ li {
     opacity: 1;
 }
 
+/* ── Form actions ── */
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
 /* ── Stats ── */
 .stats-row {
     display: grid;

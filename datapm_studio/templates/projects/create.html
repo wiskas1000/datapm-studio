@@ -8,7 +8,152 @@
     <h1>New Project</h1>
   </div>
 </div>
-<div class="card">
-  <p class="subtitle">Project creation wizard — coming soon.</p>
-</div>
+
+<form method="post" action="{{ url_for('projects.create_project') }}">
+  <div class="card">
+    <h2>Basics</h2>
+
+    {% if error %}
+    <div class="flash flash-error">{{ error }}</div>
+    {% endif %}
+
+    <div class="form-group">
+      <label for="title">Title *</label>
+      <input type="text" id="title" name="title" required
+             value="{{ form.title or '' }}" placeholder="e.g. Churn Analysis Q2">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="project_type">Type</label>
+        <select id="project_type" name="project_type">
+          <option value="planned" {{ 'selected' if form.project_type == 'planned' else '' }}>Planned</option>
+          <option value="adhoc" {{ 'selected' if form.project_type == 'adhoc' else '' }}>Ad-hoc</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="domain">Domain</label>
+        <input type="text" id="domain" name="domain"
+               value="{{ form.domain or '' }}" placeholder="e.g. healthcare, finance">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3"
+                placeholder="Brief description of the project">{{ form.description or '' }}</textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>People &amp; Tags</h2>
+
+    <div class="form-group">
+      <label>Requestor</label>
+      <div id="requestor-field">
+        {% if form.requestor_id and selected_person %}
+        <div class="selected-value">
+          <span>{{ selected_person.first_name }} {{ selected_person.last_name }}</span>
+          <input type="hidden" name="requestor_id" value="{{ selected_person.id }}">
+          <button type="button" class="btn-clear" onclick="clearPerson()" title="Remove">&times;</button>
+        </div>
+        {% else %}
+        <div class="search-input-wrap">
+          <input type="search" name="requestor_q" placeholder="Search people…"
+                 hx-get="{{ url_for('persons.search_persons') }}" hx-trigger="keyup changed delay:300ms"
+                 hx-target="#requestor-results" hx-params="*"
+                 hx-vals='{"q": this.value}' autocomplete="off">
+          <div id="requestor-results" class="dropdown-results"></div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Tags</label>
+      <div class="search-input-wrap">
+        <input type="search" name="tag_q" placeholder="Search tags…"
+               hx-get="{{ url_for('tags.search_tags') }}" hx-trigger="keyup changed delay:300ms"
+               hx-target="#tag-results" hx-params="*"
+               hx-vals='{"q": this.value}' autocomplete="off">
+        <div id="tag-results" class="dropdown-results"></div>
+      </div>
+      <div id="tag-chips" class="tag-chips">
+        {% for tag in selected_tags %}
+        <span class="tag-chip">
+          {{ tag.name }}
+          <input type="hidden" name="tag_ids" value="{{ tag.id }}">
+          <button type="button" class="btn-remove" onclick="this.parentElement.remove()">&times;</button>
+        </span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Settings</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="template_used">Template</label>
+        <select id="template_used" name="template_used">
+          <option value="analysis" {{ 'selected' if (form.template_used or 'analysis') == 'analysis' else '' }}>Analysis</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="root_name">Project root</label>
+        <select id="root_name" name="root_name">
+          {% for root in roots %}
+          <option value="{{ root.name }}"
+                  {{ 'selected' if root.is_default else '' }}>
+            {{ root.name }} ({{ root.absolute_path }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Dates</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="request_date">Request date</label>
+        <input type="date" id="request_date" name="request_date"
+               value="{{ form.request_date or today }}">
+      </div>
+
+      <div class="form-group">
+        <label for="estimated_hours">Estimated hours</label>
+        <input type="number" id="estimated_hours" name="estimated_hours"
+               value="{{ form.estimated_hours or '' }}" min="0" step="0.5"
+               placeholder="e.g. 40">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="expected_start">Expected start</label>
+        <input type="date" id="expected_start" name="expected_start"
+               value="{{ form.expected_start or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="expected_end">Expected end</label>
+        <input type="date" id="expected_end" name="expected_end"
+               value="{{ form.expected_end or '' }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Create Project</button>
+    <a href="{{ url_for('projects.list_projects') }}" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}
