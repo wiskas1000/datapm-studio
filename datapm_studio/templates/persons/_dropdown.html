@@ -1,13 +1,20 @@
 {% for person in persons %}
-<button type="button" class="dropdown-item">
+<button type="button" class="dropdown-item"
+        data-person-id="{{ person.id }}"
+        data-person-name="{{ person.first_name }} {{ person.last_name }}"
+        onclick="selectPerson(this)">
   {{ person.first_name }} {{ person.last_name }}
+  {% if person.function_title %}
+  <span class="dropdown-item-hint">{{ person.function_title }}</span>
+  {% endif %}
 </button>
 {% endfor %}
 {% if not persons and query %}
 <button type="button"
         hx-get="{{ url_for('persons.new_inline') }}"
         hx-target="#requestor-field"
-        class="dropdown-item">
+        hx-swap="innerHTML"
+        class="dropdown-item dropdown-item-action">
   + Add new person
 </button>
 {% endif %}
