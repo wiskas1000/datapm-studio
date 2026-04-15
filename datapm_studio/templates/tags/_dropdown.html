@@ -1,10 +1,14 @@
 {% for tag in tags %}
-<button type="button" class="dropdown-item tag-option">
+<button type="button" class="dropdown-item"
+        data-tag-id="{{ tag.id }}"
+        data-tag-name="{{ tag.name }}"
+        onclick="selectTag(this)">
   {{ tag.name }}
 </button>
 {% endfor %}
 {% if not tags and query %}
-<button type="button" class="dropdown-item">
+<button type="button" class="dropdown-item dropdown-item-action"
+        onclick="createAndSelectTag('{{ query | e }}')">
   + Create "{{ query }}"
 </button>
 {% endif %}
