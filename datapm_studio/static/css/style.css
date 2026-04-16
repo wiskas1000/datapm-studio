@@ -780,6 +780,120 @@ li {
 :root .icon-sun, [data-theme="dark"] .icon-sun { display: none; }
 :root .icon-moon, [data-theme="dark"] .icon-moon { display: block; }
 
+/* ── Close-out Checklist ── */
+.closeout-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.closeout-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+}
+
+.closeout-item:last-child {
+    border-bottom: none;
+}
+
+.closeout-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    width: 1.5rem;
+    text-align: center;
+}
+
+.closeout-pass {
+    color: var(--green);
+}
+
+.closeout-fail {
+    color: var(--red);
+}
+
+.closeout-warn {
+    color: var(--orange);
+}
+
+.closeout-desc {
+    flex: 1;
+}
+
+.closeout-fix-link {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.closeout-fix-link:hover {
+    text-decoration: underline;
+}
+
+.closeout-severity {
+    flex-shrink: 0;
+}
+
+.badge-critical {
+    background: var(--red-dim);
+    color: var(--red);
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-warning {
+    background: var(--orange-dim);
+    color: var(--orange);
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.closeout-all-clear {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--green);
+}
+
+.closeout-done-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--green);
+}
+
+.closeout-file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+}
+
+.closeout-file-list li {
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+
+.closeout-file-list li:last-child {
+    border-bottom: none;
+}
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
     main { padding: 1rem; }
