@@ -136,12 +136,12 @@
 
 ### Acceptance Criteria
 
-- [ ] Description gap shows an inline edit form (reuses `_description_edit.html` pattern)
-- [ ] Realized start/end gaps show inline date pickers
-- [ ] Status gap shows an inline select dropdown
-- [ ] Requestor gap shows the person search dropdown (reuses `_person_add_form.html` pattern)
-- [ ] After fixing a gap inline, the checklist re-renders to reflect the change
-- [ ] Gaps without inline fix (deliverables, data files) keep the current "Fix" link to the project page
+- [x] Description gap shows an inline edit form
+- [x] Realized start/end gaps show inline date pickers
+- [ ] ~~Status gap shows an inline select dropdown~~ (skipped — "mark as done" button already handles this)
+- [x] Requestor gap shows the person search dropdown
+- [x] After fixing a gap inline, the checklist re-renders to reflect the change
+- [x] Gaps without inline fix (deliverables, data files) keep the current "Fix" link to the project page
 
 ### PR Breakdown
 
