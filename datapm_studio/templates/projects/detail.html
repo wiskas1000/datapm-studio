@@ -99,6 +99,7 @@
 </div>
 
 <div class="form-actions">
+  <a href="{{ url_for('closeout.checklist', slug=project.slug) }}" class="btn btn-primary">Close-out checklist</a>
   <a href="{{ url_for('projects.list_projects') }}" class="btn btn-secondary">&larr; Back to projects</a>
 </div>
 {% endblock %}
