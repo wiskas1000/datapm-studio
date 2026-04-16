@@ -103,21 +103,21 @@
 
 ### Acceptance Criteria
 
-- [ ] `/projects/<slug>/closeout` shows a computed checklist (re-computed on every request, no stored state)
-- [ ] "Close-out" button on project detail page links to the checklist
-- [ ] Gap analysis checks:
-  - [ ] Status is still active (not yet closed)
-  - [ ] No requestor linked
-  - [ ] No description set
-  - [ ] Missing realized dates (realized_start, realized_end)
-  - [ ] No deliverables registered (`DeliverableRepository.list_for_project()`)
-  - [ ] Undelivered deliverables (`delivered_at IS NULL`)
-  - [ ] No data files registered (`DataFileRepository.list_for_project()`)
-  - [ ] Data files missing sensitivity (`sensitivity IS NULL`)
-- [ ] Filesystem scanner finds files on disk not registered in the DataFile table
-- [ ] Each gap shows: status icon (pass/warn/fail), description, and a link to fix it (inline edit or detail page)
-- [ ] "Mark as done" button at the bottom (only enabled when no critical gaps remain)
-- [ ] Marking as done sets `status = "done"` and `realized_end = today` (if not already set)
+- [x] `/projects/<slug>/closeout` shows a computed checklist (re-computed on every request, no stored state)
+- [x] "Close-out" button on project detail page links to the checklist
+- [x] Gap analysis checks:
+  - [x] Status is still active (not yet closed)
+  - [x] No requestor linked
+  - [x] No description set
+  - [x] Missing realized dates (realized_start, realized_end)
+  - [x] No deliverables registered (`DeliverableRepository.list_for_project()`)
+  - [x] Undelivered deliverables (`delivered_at IS NULL`)
+  - [x] No data files registered (`DataFileRepository.list_for_project()`)
+  - [x] Data files missing sensitivity (`sensitivity IS NULL`)
+- [x] Filesystem scanner finds files on disk not registered in the DataFile table
+- [x] Each gap shows: status icon (pass/warn/fail), description, and a link to fix it (inline edit or detail page)
+- [x] "Mark as done" button at the bottom (only enabled when no critical gaps remain)
+- [x] Marking as done sets `status = "done"` and `realized_end = today` (if not already set)
 
 ### PR Breakdown
 
