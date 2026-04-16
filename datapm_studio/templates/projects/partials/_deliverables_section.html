@@ -1,0 +1,50 @@
+{# Deliverables section for project detail — shows registered deliverables. #}
+<div id="project-deliverables" class="card">
+  <div class="card-header-row">
+    <h2>Deliverables</h2>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="{{ url_for('projects.add_deliverable_form', slug=project.slug) }}"
+            hx-target="#deliverable-add-area"
+            hx-swap="innerHTML">+ Register</button>
+  </div>
+
+  {% if deliverables %}
+  {% for d in deliverables %}
+  <div class="deliverable-card" id="deliverable-{{ d.id }}">
+    <div class="deliverable-header">
+      <span class="deliverable-type">{{ d.type }}</span>
+      {% if d.version %}
+      <span class="badge">{{ d.version }}</span>
+      {% endif %}
+      {% if d.delivered_at %}
+      <span class="badge badge-delivered">Delivered {{ d.delivered_at[:10] }}</span>
+      {% else %}
+      <span class="badge badge-pending">Pending</span>
+      {% endif %}
+    </div>
+    <dl class="detail-grid detail-grid-compact">
+      {% if d.file_path %}
+      <dt>File</dt>
+      <dd><code>{{ d.file_path }}</code></dd>
+      {% endif %}
+      {% if d.file_format %}
+      <dt>Format</dt>
+      <dd>{{ d.file_format }}</dd>
+      {% endif %}
+    </dl>
+    {% if not d.delivered_at %}
+    <div class="deliverable-actions">
+      <button class="btn btn-primary btn-xs"
+              hx-post="{{ url_for('projects.mark_deliverable_delivered', slug=project.slug, deliverable_id=d.id) }}"
+              hx-target="#project-deliverables"
+              hx-swap="outerHTML">Mark delivered</button>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="text-muted">No deliverables registered yet.</p>
+  {% endif %}
+
+  <div id="deliverable-add-area"></div>
+</div>

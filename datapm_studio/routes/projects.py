@@ -28,6 +28,7 @@ from data_project_manager.db.repositories.data_file import (
     DataFileRepository,
     EntityTypeRepository,
 )
+from data_project_manager.db.repositories.deliverable import DeliverableRepository
 from data_project_manager.db.repositories.question import RequestQuestionRepository
 from data_project_manager.db.repositories.tag import ProjectTagRepository, TagRepository
 
@@ -252,6 +253,9 @@ def detail(slug):
     file_entity_types = {f.id: et_repo.list_for_file(f.id) for f in data_files}
     file_agg_levels = {f.id: agg_repo.list_for_file(f.id) for f in data_files}
 
+    # Fetch deliverables
+    deliverables = DeliverableRepository(conn).list_for_project(project.id)
+
     # Fetch project root name
     root = None
     if project.root_id:
@@ -266,6 +270,7 @@ def detail(slug):
         data_files=data_files,
         file_entity_types=file_entity_types,
         file_agg_levels=file_agg_levels,
+        deliverables=deliverables,
         root=root,
     )
 
@@ -989,3 +994,79 @@ def remove_agg_level(slug, file_id):
             data_file_id=file_id, agg_level_id=agg_level_id
         )
     return _render_data_files_section(project)
+
+
+# ── Deliverable management ──
+
+
+def _render_deliverables_section(project):
+    """Render the deliverables section partial."""
+    conn = _get_conn()
+    deliverables = DeliverableRepository(conn).list_for_project(project.id)
+    return render_template(
+        "projects/partials/_deliverables_section.html",
+        project=project,
+        deliverables=deliverables,
+    )
+
+
+@bp.route("/<slug>/deliverables/add-form")
+def add_deliverable_form(slug):
+    """Return the inline form for registering a deliverable."""
+    _ = _get_project_or_404(slug)
+    return render_template(
+        "projects/partials/_deliverable_add_form.html",
+        slug=slug,
+    )
+
+
+@bp.route("/<slug>/deliverables/add", methods=["POST"])
+def add_deliverable(slug):
+    """Register a deliverable for a project."""
+    from data_project_manager.db.repositories._helpers import now_iso
+
+    project = _get_project_or_404(slug)
+
+    type_ = request.form.get("type", "").strip()
+    file_path = request.form.get("file_path", "").strip() or None
+    file_format = request.form.get("file_format", "").strip() or None
+    version = request.form.get("version", "").strip() or None
+    mark_delivered = bool(request.form.get("mark_delivered"))
+
+    if not type_:
+        return render_template(
+            "projects/partials/_deliverable_add_form.html",
+            slug=slug,
+            type=type_,
+            file_path=file_path or "",
+            file_format=file_format or "",
+            version=version or "",
+            mark_delivered=mark_delivered,
+            error="Type is required.",
+        )
+
+    conn = _get_conn()
+    DeliverableRepository(conn).create(
+        project_id=project.id,
+        type=type_,
+        file_path=file_path,
+        file_format=file_format,
+        version=version,
+        delivered_at=now_iso() if mark_delivered else None,
+    )
+    return _render_deliverables_section(project)
+
+
+@bp.route("/<slug>/deliverables/<deliverable_id>/mark-delivered", methods=["POST"])
+def mark_deliverable_delivered(slug, deliverable_id):
+    """Mark a deliverable as delivered (sets delivered_at to now)."""
+    from flask import abort
+
+    project = _get_project_or_404(slug)
+
+    conn = _get_conn()
+    try:
+        DeliverableRepository(conn).mark_delivered(deliverable_id)
+    except ValueError:
+        abort(404)
+    return _render_deliverables_section(project)

@@ -712,6 +712,42 @@ li {
     font-size: 0.7rem;
 }
 
+/* ── Deliverables ── */
+.deliverable-card {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.deliverable-card:last-of-type {
+    border-bottom: none;
+}
+
+.deliverable-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.deliverable-type {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.badge-delivered {
+    background: var(--green-dim);
+    color: var(--green);
+}
+
+.badge-pending {
+    background: var(--orange-dim);
+    color: var(--orange);
+}
+
+.deliverable-actions {
+    margin-top: 0.5rem;
+}
+
 .dropdown-item-create {
     font-style: italic;
 }
