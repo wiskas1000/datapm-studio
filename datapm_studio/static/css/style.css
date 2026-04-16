@@ -547,25 +547,18 @@ li {
     color: inherit;
     cursor: pointer;
     text-align: left;
-    letter-spacing: inherit;
-    text-transform: inherit;
 }
 
 .th-sort::after {
-    content: "";
-    display: inline-block;
-    width: 0.7em;
-    margin-left: 0.25em;
-    color: var(--text-muted);
-    opacity: 0;
-    transition: opacity 0.15s;
+    content: " ↕";
+    opacity: 0.35;
+    font-size: 0.75em;
 }
 
-th:hover .th-sort::after { opacity: 0.5; content: "↕"; }
-.th-sort[data-dir="asc"]::after { content: "↑"; opacity: 1; color: var(--text); }
-.th-sort[data-dir="desc"]::after { content: "↓"; opacity: 1; color: var(--text); }
+.th-sort[data-dir="asc"]::after { content: " ↑"; opacity: 1; }
+.th-sort[data-dir="desc"]::after { content: " ↓"; opacity: 1; }
 
-.th-sort:hover { color: var(--text); }
+.th-sort:hover { color: var(--accent); }
 
 .selected-value {
     display: flex;
