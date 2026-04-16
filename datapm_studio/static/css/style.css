@@ -583,6 +583,92 @@ li {
     opacity: 1;
 }
 
+/* ── Inline Edit ── */
+.btn-inline-edit {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 0 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+}
+
+.btn-inline-edit:hover {
+    color: var(--accent);
+}
+
+.inline-edit-row:hover .btn-inline-edit,
+.card:hover > div > .card-header-row .btn-inline-edit,
+.inline-edit-status:hover .btn-inline-edit {
+    opacity: 1;
+}
+
+.inline-edit-row {
+    display: contents;
+}
+
+.inline-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inline-edit-form input,
+.inline-edit-form select,
+.inline-edit-form textarea {
+    width: 100%;
+}
+
+.inline-edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+.inline-edit-error {
+    color: var(--red);
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.inline-edit-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inline-edit-form-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inline-edit-form-inline select {
+    width: auto;
+}
+
+.card-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.card-header-row h2 {
+    margin-bottom: 0;
+}
+
 /* ── Detail grid (definition list) ── */
 .detail-grid {
     display: grid;
