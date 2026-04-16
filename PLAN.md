@@ -73,18 +73,18 @@
 
 ### Acceptance Criteria
 
-- [ ] Project detail page has inline "Edit" buttons for scalar fields: status, domain, description, dates, estimated hours, external_url
-- [ ] Clicking "Edit" on a field swaps it to an inline edit form (HTMX `hx-get`); saving swaps back to read mode (HTMX `hx-post`)
-- [ ] Status field uses a `<select>` dropdown with valid values: active, paused, done, archived
-- [ ] Project detail page allows adding/removing persons (with role) and tags
-- [ ] Adding a person reuses the existing HTMX search dropdown from the create form
-- [ ] Adding a tag reuses the existing HTMX search dropdown from the create form
-- [ ] Removing a person or tag uses `ProjectPersonRepository.remove()` / `ProjectTagRepository.remove()`
-- [ ] `/persons` shows a searchable list of current persons with name, email, function, department
-- [ ] `/persons/<id>` shows person detail with edit form for all fields
-- [ ] Editing a person creates a new SCD2 version via `PersonRepository.create_new_version()`
-- [ ] Version history shown on person detail page via `ChangeLogRepository`
-- [ ] Quick "add new person" form on the persons list page
+- [x] Project detail page has inline "Edit" buttons for scalar fields: status, domain, description, dates, estimated hours, external_url
+- [x] Clicking "Edit" on a field swaps it to an inline edit form (HTMX `hx-get`); saving swaps back to read mode (HTMX `hx-post`)
+- [x] Status field uses a `<select>` dropdown with valid values: active, paused, done, archived
+- [x] Project detail page allows adding/removing persons (with role) and tags
+- [x] Adding a person reuses the existing HTMX search dropdown from the create form
+- [x] Adding a tag reuses the existing HTMX search dropdown from the create form
+- [x] Removing a person or tag uses `ProjectPersonRepository.remove()` / `ProjectTagRepository.remove()`
+- [x] `/persons` shows a searchable list of current persons with name, email, function, department
+- [x] `/persons/<id>` shows person detail with edit form for all fields
+- [x] Editing a person creates a new SCD2 version via `PersonRepository.create_new_version()`
+- [x] Version history shown on person detail page via `ChangeLogRepository`
+- [x] Quick "add new person" form on the persons list page
 
 ### PR Breakdown
 
