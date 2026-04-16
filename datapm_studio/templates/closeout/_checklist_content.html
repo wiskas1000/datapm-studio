@@ -1,0 +1,69 @@
+<div id="closeout-content">
+
+{% if project.status == "done" %}
+<div class="card">
+  <div class="closeout-done-banner">
+    <span class="closeout-icon closeout-pass">&#10003;</span>
+    <span>This project has already been marked as <strong>done</strong>.</span>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Checklist</h2>
+  {% if gaps %}
+  <ul class="closeout-list">
+    {% for gap in gaps %}
+    <li class="closeout-item closeout-{{ gap.severity }}">
+      <span class="closeout-icon {% if gap.severity == 'critical' %}closeout-fail{% else %}closeout-warn{% endif %}">
+        {% if gap.severity == "critical" %}&#10007;{% else %}&#9888;{% endif %}
+      </span>
+      <span class="closeout-desc">
+        {{ gap.description }}
+        {% if gap.fix_field %}
+        <button class="closeout-fix-btn"
+                hx-get="{{ url_for('closeout.fix_field_form', slug=project.slug, field=gap.fix_field) if gap.fix_field != 'requestor' else url_for('closeout.fix_requestor_form', slug=project.slug) }}"
+                hx-target="#closeout-content"
+                hx-swap="outerHTML">Fix</button>
+        {% elif gap.fix_url %}
+        <a href="{{ gap.fix_url }}" class="closeout-fix-link">Fix</a>
+        {% endif %}
+      </span>
+      <span class="closeout-severity badge badge-{{ gap.severity }}">{{ gap.severity }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="closeout-all-clear">
+    <span class="closeout-icon closeout-pass">&#10003;</span>
+    <span>All checks passed. Ready to close this project.</span>
+  </div>
+  {% endif %}
+</div>
+
+{% if untracked_files %}
+<div class="card">
+  <h2>Untracked files</h2>
+  <p class="text-muted">Files found on disk but not registered in the database.</p>
+  <ul class="closeout-file-list">
+    {% for file in untracked_files %}
+    <li><code>{{ file }}</code></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="form-actions">
+  {% if can_close %}
+  <form method="post" action="{{ url_for('closeout.mark_done', slug=project.slug) }}">
+    <button type="submit" class="btn btn-primary">Mark as done</button>
+  </form>
+  {% elif project.status == "done" %}
+  <button type="button" class="btn btn-primary" disabled>Already closed</button>
+  {% else %}
+  <button type="button" class="btn btn-primary" disabled title="Fix all critical gaps before closing">Mark as done</button>
+  {% endif %}
+  <a href="{{ url_for('projects.detail', slug=project.slug) }}" class="btn btn-secondary">&larr; Back to project</a>
+</div>
+
+</div>

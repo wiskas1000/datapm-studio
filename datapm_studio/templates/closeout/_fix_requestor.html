@@ -1,0 +1,44 @@
+<div id="closeout-content">
+<div class="card">
+  <h2>Fix: Add requestor</h2>
+  <div class="closeout-fix-form">
+    {% if selected_person %}
+    <form hx-post="{{ url_for('closeout.fix_requestor_save', slug=slug) }}"
+          hx-target="#closeout-content"
+          hx-swap="outerHTML">
+      <input type="hidden" name="person_id" value="{{ selected_person.id }}">
+      <div class="selected-value">
+        <span>{{ selected_person.first_name }} {{ selected_person.last_name }}</span>
+        <button type="button" class="btn-clear"
+                hx-get="{{ url_for('closeout.fix_requestor_form', slug=slug) }}"
+                hx-target="#closeout-content"
+                hx-swap="outerHTML">&times;</button>
+      </div>
+      <div class="closeout-fix-actions">
+        <button type="submit" class="btn btn-primary btn-sm">Add as requestor</button>
+        <button type="button" class="btn btn-secondary btn-sm"
+                hx-get="{{ url_for('closeout.checklist', slug=slug) }}"
+                hx-target="#closeout-content"
+                hx-swap="outerHTML"
+                hx-select="#closeout-content">Cancel</button>
+      </div>
+    </form>
+    {% else %}
+    <div class="search-input-wrap">
+      <input type="text" name="q" placeholder="Search people..."
+             hx-get="{{ url_for('closeout.fix_requestor_search', slug=slug) }}"
+             hx-trigger="input changed delay:300ms, focus"
+             hx-target="#closeout-requestor-results">
+    </div>
+    <div id="closeout-requestor-results" class="dropdown-results"></div>
+    <div class="closeout-fix-actions">
+      <button type="button" class="btn btn-secondary btn-sm"
+              hx-get="{{ url_for('closeout.checklist', slug=slug) }}"
+              hx-target="#closeout-content"
+              hx-swap="outerHTML"
+              hx-select="#closeout-content">Cancel</button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</div>
