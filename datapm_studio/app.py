@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from flask import Flask
@@ -75,7 +74,4 @@ def create_app(*, db_path: str | Path | None = None) -> Flask:
 def main() -> None:
     """Entry point for `datapm-studio` CLI command."""
     app = create_app()
-    # Debug (including the Werkzeug interactive debugger) is off by default.
-    # Opt in with DATAPM_STUDIO_DEBUG=1 for local development only.
-    debug = os.environ.get("DATAPM_STUDIO_DEBUG", "").lower() in {"1", "true", "yes"}
-    app.run(port=5555, debug=debug)
+    app.run(port=5555, debug=False)

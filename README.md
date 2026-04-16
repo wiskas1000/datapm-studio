@@ -30,12 +30,6 @@ uv run datapm-studio
 
 Serves on `http://localhost:5555`. Press Ctrl+C in the terminal to stop.
 
-To enable the Werkzeug interactive debugger (local development only):
-
-```bash
-DATAPM_STUDIO_DEBUG=1 uv run datapm-studio
-```
-
 ## Architecture
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full design document.
