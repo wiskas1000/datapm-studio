@@ -10,7 +10,7 @@ datapm-studio is a local Flask + HTMX web UI for managing analytical project met
 - A project creation wizard with searchable dropdowns for people, tags, and dimensions
 - A project close-out checklist that surfaces missing metadata
 - A person management UI (search, select, add new — reusing the existing SCD2 Person table)
-- A companion to `datapm` — launched via `datapm web`, uses the same DB
+- A companion to `datapm` — launched via `uv run datapm-studio`, uses the same DB
 
 ## What This Tool Is NOT (for now)
 
@@ -35,7 +35,7 @@ datapm-studio is a local Flask + HTMX web UI for managing analytical project met
 | Component | Choice | Notes |
 |-----------|--------|-------|
 | Package manager | uv | All commands use `uv run` |
-| Python | ≥ 3.10 | |
+| Python | ≥ 3.11 | |
 | Web framework | Flask ≥ 3.0 | Runtime dependency |
 | Frontend interactivity | HTMX 2.x | Loaded from CDN, no npm |
 | CSS | Custom design system | DM Sans / DM Mono from Google Fonts CDN, dark/light theme toggle |
@@ -54,7 +54,7 @@ No JavaScript framework. No npm. No build step.
 uv sync --extra dev
 
 # Launch the web UI
-uv run datapm web
+uv run datapm-studio
 
 # Run tests
 uv run pytest

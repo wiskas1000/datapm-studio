@@ -18,6 +18,9 @@ def create_app(*, db_path: str | Path | None = None) -> Flask:
             temporary SQLite file instead of the user's real database.
     """
     app = Flask(__name__)
+    # Hardcoded key is acceptable: Studio is local single-user, no auth, and
+    # sessions are used only for flash messages. Do not reuse this app in a
+    # multi-user or networked deployment without replacing the key.
     app.secret_key = "datapm-studio-local-only"
 
     # Load datapm config
@@ -71,4 +74,4 @@ def create_app(*, db_path: str | Path | None = None) -> Flask:
 def main() -> None:
     """Entry point for `datapm-studio` CLI command."""
     app = create_app()
-    app.run(port=5555, debug=True)
+    app.run(port=5555, debug=False)
