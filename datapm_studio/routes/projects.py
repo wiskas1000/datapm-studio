@@ -21,6 +21,7 @@ from data_project_manager.db.repositories.project import (
     ProjectRepository,
     ProjectRootRepository,
 )
+from data_project_manager.db.repositories.data_file import DataFileRepository
 from data_project_manager.db.repositories.question import RequestQuestionRepository
 from data_project_manager.db.repositories.tag import ProjectTagRepository, TagRepository
 
@@ -238,6 +239,9 @@ def detail(slug):
     # Fetch request questions
     questions = RequestQuestionRepository(conn).list_for_project(project.id)
 
+    # Fetch data files
+    data_files = DataFileRepository(conn).list_for_project(project.id)
+
     # Fetch project root name
     root = None
     if project.root_id:
@@ -249,6 +253,7 @@ def detail(slug):
         persons=persons,
         tags=tags,
         questions=questions,
+        data_files=data_files,
         root=root,
     )
 
@@ -722,3 +727,68 @@ def add_question(slug):
         data_period_to=data_period_to,
     )
     return _render_questions_section(project)
+
+
+# ── Data file management ──
+
+
+def _render_data_files_section(project):
+    """Render the data files section partial."""
+    conn = _get_conn()
+    data_files = DataFileRepository(conn).list_for_project(project.id)
+    return render_template(
+        "projects/partials/_data_files_section.html",
+        project=project,
+        data_files=data_files,
+    )
+
+
+@bp.route("/<slug>/data-files/add-form")
+def add_data_file_form(slug):
+    """Return the inline form for registering a data file."""
+    _ = _get_project_or_404(slug)
+    return render_template(
+        "projects/partials/_data_file_add_form.html",
+        slug=slug,
+    )
+
+
+@bp.route("/<slug>/data-files/add", methods=["POST"])
+def add_data_file(slug):
+    """Register a data file for a project."""
+    project = _get_project_or_404(slug)
+
+    file_path = request.form.get("file_path", "").strip()
+    file_format = request.form.get("file_format", "").strip() or None
+    sensitivity = request.form.get("sensitivity", "").strip() or None
+    is_source = bool(request.form.get("is_source"))
+    data_period_from = request.form.get("data_period_from", "").strip() or None
+    data_period_to = request.form.get("data_period_to", "").strip() or None
+    retention_date = request.form.get("retention_date", "").strip() or None
+
+    if not file_path:
+        return render_template(
+            "projects/partials/_data_file_add_form.html",
+            slug=slug,
+            file_path=file_path,
+            file_format=file_format or "",
+            sensitivity=sensitivity or "",
+            is_source=is_source,
+            data_period_from=data_period_from or "",
+            data_period_to=data_period_to or "",
+            retention_date=retention_date or "",
+            error="File path is required.",
+        )
+
+    conn = _get_conn()
+    DataFileRepository(conn).create(
+        project_id=project.id,
+        file_path=file_path,
+        file_format=file_format,
+        sensitivity=sensitivity,
+        is_source=is_source,
+        data_period_from=data_period_from,
+        data_period_to=data_period_to,
+        retention_date=retention_date,
+    )
+    return _render_data_files_section(project)

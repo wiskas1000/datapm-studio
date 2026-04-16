@@ -1,0 +1,51 @@
+{# Data files section for project detail — shows registered files with add form. #}
+<div id="project-data-files" class="card">
+  <div class="card-header-row">
+    <h2>Data Files</h2>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="{{ url_for('projects.add_data_file_form', slug=project.slug) }}"
+            hx-target="#data-file-add-area"
+            hx-swap="innerHTML">+ Register</button>
+  </div>
+
+  {% if data_files %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>File path</th>
+        <th>Format</th>
+        <th>Sensitivity</th>
+        <th>Source</th>
+        <th>Data period</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in data_files %}
+      <tr>
+        <td><code>{{ f.file_path }}</code></td>
+        <td>{{ f.file_format or "—" }}</td>
+        <td>
+          {% if f.sensitivity %}
+          <span class="badge badge-sensitivity">{{ f.sensitivity }}</span>
+          {% else %}
+          <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+        <td>{{ "Yes" if f.is_source else "No" }}</td>
+        <td>
+          {% if f.data_period_from or f.data_period_to %}
+          {{ f.data_period_from or "—" }} to {{ f.data_period_to or "—" }}
+          {% else %}
+          <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted">No data files registered yet.</p>
+  {% endif %}
+
+  <div id="data-file-add-area"></div>
+</div>
