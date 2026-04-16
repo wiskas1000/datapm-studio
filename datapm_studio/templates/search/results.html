@@ -10,8 +10,8 @@
 </div>
 
 <div class="card" style="margin-bottom: 1.5rem;">
-  <form action="{{ url_for('search.search') }}" method="get" style="display: flex; gap: 0.75rem;">
-    <input type="search" name="q" value="{{ query }}" placeholder="Search projects...">
+  <form action="{{ url_for('search.search') }}" method="get" class="search-form">
+    <input type="search" name="q" value="{{ query }}" placeholder="Search projects..." autofocus>
     <button type="submit">Search</button>
   </form>
 </div>
@@ -19,9 +19,31 @@
 {% if query %}
   {% if results %}
   <div class="card">
-    <ul>
-      {% for result in results %}
-      <li><a href="{{ url_for('projects.detail', slug=result.slug) }}">{{ result.title }}</a></li>
+    <ul class="search-results">
+      {% for item in results %}
+      <li class="search-result">
+        <div class="search-result-header">
+          <a href="{{ url_for('projects.detail', slug=item.result.slug) }}" class="search-result-title">
+            {{ item.result.title }}
+          </a>
+          <span class="badge badge-{{ item.result.status }}">{{ item.result.status }}</span>
+        </div>
+        <div class="search-result-meta">
+          <span class="search-result-slug">{{ item.result.slug }}</span>
+          {% if item.result.domain %}<span>· {{ item.result.domain }}</span>{% endif %}
+          {% if item.requestor %}<span>· {{ item.requestor }}</span>{% endif %}
+        </div>
+        {% if item.entity_types or item.aggregation_levels %}
+        <div class="tag-chips">
+          {% for name in item.entity_types %}
+          <span class="tag-chip">{{ name }}</span>
+          {% endfor %}
+          {% for name in item.aggregation_levels %}
+          <span class="tag-chip">{{ name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </li>
       {% endfor %}
     </ul>
   </div>
