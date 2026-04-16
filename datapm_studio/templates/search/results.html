@@ -21,17 +21,16 @@
   {% if not query %}
   <p class="search-results-heading">All projects ({{ results|length }})</p>
   {% endif %}
-  <table>
+  <table class="sortable-table">
     <thead>
       <tr>
-        <th>Title</th>
-        <th>Folder</th>
-        <th>Status</th>
-        <th>Domain</th>
-        <th>Requestor</th>
-        <th>Entity types</th>
-        <th>Aggregation levels</th>
-        <th>Created</th>
+        <th><button type="button" class="th-sort" data-col="0">Title</button></th>
+        <th><button type="button" class="th-sort" data-col="1">Folder</button></th>
+        <th><button type="button" class="th-sort" data-col="2">Status</button></th>
+        <th><button type="button" class="th-sort" data-col="3">Domain</button></th>
+        <th><button type="button" class="th-sort" data-col="4">Requestor</button></th>
+        <th><button type="button" class="th-sort" data-col="5">Entity types</button></th>
+        <th><button type="button" class="th-sort" data-col="6">Aggregation levels</button></th>
       </tr>
     </thead>
     <tbody>
@@ -56,7 +55,6 @@
           </div>
           {% endif %}
         </td>
-        <td>{{ item.result.created_at[:10] }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -71,4 +69,32 @@
   <p>No projects yet.</p>
 </div>
 {% endif %}
+
+<script>
+(function () {
+    document.querySelectorAll('table.sortable-table').forEach(function (table) {
+        var tbody = table.tBodies[0];
+        if (!tbody) return;
+        table.querySelectorAll('button.th-sort').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var col = parseInt(btn.getAttribute('data-col'), 10);
+                var asc = btn.getAttribute('data-dir') !== 'asc';
+                table.querySelectorAll('button.th-sort').forEach(function (b) {
+                    b.removeAttribute('data-dir');
+                });
+                btn.setAttribute('data-dir', asc ? 'asc' : 'desc');
+                var rows = Array.prototype.slice.call(tbody.rows);
+                rows.sort(function (a, b) {
+                    var av = (a.cells[col].innerText || '').trim().toLowerCase();
+                    var bv = (b.cells[col].innerText || '').trim().toLowerCase();
+                    if (av < bv) return asc ? -1 : 1;
+                    if (av > bv) return asc ? 1 : -1;
+                    return 0;
+                });
+                rows.forEach(function (r) { tbody.appendChild(r); });
+            });
+        });
+    });
+})();
+</script>
 {% endblock %}

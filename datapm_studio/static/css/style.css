@@ -538,6 +538,28 @@ li {
     font-size: 0.85rem;
 }
 
+.th-sort {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+}
+
+.th-sort::after {
+    content: " ↕";
+    opacity: 0.35;
+    font-size: 0.75em;
+}
+
+.th-sort[data-dir="asc"]::after { content: " ↑"; opacity: 1; }
+.th-sort[data-dir="desc"]::after { content: " ↓"; opacity: 1; }
+
+.th-sort:hover { color: var(--accent); }
+
 .selected-value {
     display: flex;
     align-items: center;
