@@ -1,4 +1,4 @@
-{# Data files section for project detail — shows registered files with add form. #}
+{# Data files section for project detail — shows registered files with lookups. #}
 <div id="project-data-files" class="card">
   <div class="card-header-row">
     <h2>Data Files</h2>
@@ -9,40 +9,82 @@
   </div>
 
   {% if data_files %}
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>File path</th>
-        <th>Format</th>
-        <th>Sensitivity</th>
-        <th>Source</th>
-        <th>Data period</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for f in data_files %}
-      <tr>
-        <td><code>{{ f.file_path }}</code></td>
-        <td>{{ f.file_format or "—" }}</td>
-        <td>
-          {% if f.sensitivity %}
-          <span class="badge badge-sensitivity">{{ f.sensitivity }}</span>
-          {% else %}
-          <span class="text-muted">—</span>
-          {% endif %}
-        </td>
-        <td>{{ "Yes" if f.is_source else "No" }}</td>
-        <td>
-          {% if f.data_period_from or f.data_period_to %}
-          {{ f.data_period_from or "—" }} to {{ f.data_period_to or "—" }}
-          {% else %}
-          <span class="text-muted">—</span>
-          {% endif %}
-        </td>
-      </tr>
+  {% for f in data_files %}
+  <div class="data-file-card" id="data-file-{{ f.id }}">
+    <div class="data-file-header">
+      <code>{{ f.file_path }}</code>
+      {% if f.sensitivity %}
+      <span class="badge badge-sensitivity">{{ f.sensitivity }}</span>
+      {% endif %}
+    </div>
+    <dl class="detail-grid detail-grid-compact">
+      <dt>Format</dt>
+      <dd>{{ f.file_format or "—" }}</dd>
+      <dt>Source</dt>
+      <dd>{{ "Yes" if f.is_source else "No" }}</dd>
+      {% if f.data_period_from or f.data_period_to %}
+      <dt>Data period</dt>
+      <dd>{{ f.data_period_from or "—" }} to {{ f.data_period_to or "—" }}</dd>
+      {% endif %}
+      {% if f.retention_date %}
+      <dt>Retention</dt>
+      <dd>{{ f.retention_date }}</dd>
+      {% endif %}
+    </dl>
+
+    {# Entity types for this file #}
+    <div class="lookup-row" id="file-{{ f.id }}-entity-types">
+      <span class="lookup-label">Entity types:</span>
+      {% set ets = file_entity_types.get(f.id, []) %}
+      {% if ets %}
+      {% for et in ets %}
+      <span class="tag-chip">
+        {{ et.name }}
+        <button class="btn-remove"
+                hx-post="{{ url_for('projects.remove_entity_type', slug=project.slug, file_id=f.id) }}"
+                hx-vals='{"entity_type_id": "{{ et.id }}"}'
+                hx-target="#project-data-files"
+                hx-swap="outerHTML"
+                title="Remove">&times;</button>
+      </span>
       {% endfor %}
-    </tbody>
-  </table>
+      {% else %}
+      <span class="text-muted">none</span>
+      {% endif %}
+      <button class="btn btn-secondary btn-xs"
+              hx-get="{{ url_for('projects.add_entity_type_form', slug=project.slug, file_id=f.id) }}"
+              hx-target="#file-{{ f.id }}-et-add"
+              hx-swap="innerHTML">+</button>
+      <span id="file-{{ f.id }}-et-add"></span>
+    </div>
+
+    {# Aggregation levels for this file #}
+    <div class="lookup-row" id="file-{{ f.id }}-agg-levels">
+      <span class="lookup-label">Aggregation:</span>
+      {% set aggs = file_agg_levels.get(f.id, []) %}
+      {% if aggs %}
+      {% for agg in aggs %}
+      <span class="tag-chip">
+        {{ agg.name }}
+        <button class="btn-remove"
+                hx-post="{{ url_for('projects.remove_agg_level', slug=project.slug, file_id=f.id) }}"
+                hx-vals='{"agg_level_id": "{{ agg.id }}"}'
+                hx-target="#project-data-files"
+                hx-swap="outerHTML"
+                title="Remove">&times;</button>
+      </span>
+      {% endfor %}
+      {% else %}
+      <span class="text-muted">none</span>
+      {% endif %}
+      <button class="btn btn-secondary btn-xs"
+              hx-get="{{ url_for('projects.add_agg_level_form', slug=project.slug, file_id=f.id) }}"
+              hx-target="#file-{{ f.id }}-agg-add"
+              hx-swap="innerHTML">+</button>
+      <span id="file-{{ f.id }}-agg-add"></span>
+    </div>
+  </div>
+  {% endfor %}
   {% else %}
   <p class="text-muted">No data files registered yet.</p>
   {% endif %}
