@@ -99,24 +99,34 @@
 
 ## Milestone 3: Close-out Checklist (v0.3.0)
 
-**Goal**: When closing a project, show a checklist of metadata gaps and let the user fix them on the spot.
+**Goal**: When closing a project, show a checklist of metadata gaps and let the user fix them on the spot. The close-out page is a pre-flight check before marking a project as "done" — it surfaces missing metadata so nothing falls through the cracks.
 
 ### Acceptance Criteria
 
-- [ ] `/projects/<slug>/closeout` shows a computed checklist
-- [ ] Checklist items: untracked files, missing sensitivity, no requestor, no deliverables, status still active, missing dates
-- [ ] Each checklist item links to an inline edit form to fix it
-- [ ] Filesystem scanning finds files in project folder not registered in DataFile table
-- [ ] Checklist is computed on every request (no stored state)
+- [ ] `/projects/<slug>/closeout` shows a computed checklist (re-computed on every request, no stored state)
+- [ ] "Close-out" button on project detail page links to the checklist
+- [ ] Gap analysis checks:
+  - [ ] Status is still active (not yet closed)
+  - [ ] No requestor linked
+  - [ ] No description set
+  - [ ] Missing realized dates (realized_start, realized_end)
+  - [ ] No deliverables registered (`DeliverableRepository.list_for_project()`)
+  - [ ] Undelivered deliverables (`delivered_at IS NULL`)
+  - [ ] No data files registered (`DataFileRepository.list_for_project()`)
+  - [ ] Data files missing sensitivity (`sensitivity IS NULL`)
+- [ ] Filesystem scanner finds files on disk not registered in the DataFile table
+- [ ] Each gap shows: status icon (pass/warn/fail), description, and a link to fix it (inline edit or detail page)
+- [ ] "Mark as done" button at the bottom (only enabled when no critical gaps remain)
+- [ ] Marking as done sets `status = "done"` and `realized_end = today` (if not already set)
 
 ### PR Breakdown
 
 | # | Branch | Size | Description |
 |---|--------|------|-------------|
-| 13 | `feat/closeout-gaps` | M | Gap analysis service, closeout route |
-| 14 | `feat/file-scanning` | M | Filesystem scanner for untracked files |
-| 15 | `feat/closeout-ui` | M | Checklist template with inline fix links |
-| 16 | `test/milestone-3` | M | Tests for gap analysis and scanning |
+| 14 | `feat/closeout-service` | M | Gap analysis service: computes checklist items from DB + filesystem |
+| 15 | `feat/file-scanning` | S | Filesystem scanner: walks project folder, compares to DataFile table |
+| 16 | `feat/closeout-ui` | M | Closeout route, checklist template, "mark as done" action |
+| 17 | `test/milestone-3` | M | Tests for gap analysis, file scanning, and closeout route |
 
 ---
 
