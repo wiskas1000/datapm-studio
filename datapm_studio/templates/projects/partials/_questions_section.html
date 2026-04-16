@@ -1,0 +1,30 @@
+{# Request questions section for project detail — shows questions with add form. #}
+<div id="project-questions" class="card">
+  <div class="card-header-row">
+    <h2>Request Questions</h2>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="{{ url_for('projects.add_question_form', slug=project.slug) }}"
+            hx-target="#question-add-area"
+            hx-swap="innerHTML">+ Add</button>
+  </div>
+
+  {% if questions %}
+  <div class="question-list">
+    {% for q in questions %}
+    <div class="question-item">
+      <p class="question-text">{{ q.question_text }}</p>
+      {% if q.data_period_from or q.data_period_to %}
+      <p class="text-muted question-period">
+        Data period:
+        {{ q.data_period_from or "—" }} to {{ q.data_period_to or "—" }}
+      </p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted">No request questions yet.</p>
+  {% endif %}
+
+  <div id="question-add-area"></div>
+</div>
