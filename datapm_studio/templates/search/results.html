@@ -10,25 +10,65 @@
 </div>
 
 <div class="card" style="margin-bottom: 1.5rem;">
-  <form action="{{ url_for('search.search') }}" method="get" style="display: flex; gap: 0.75rem;">
-    <input type="search" name="q" value="{{ query }}" placeholder="Search projects...">
+  <form action="{{ url_for('search.search') }}" method="get" class="search-form">
+    <input type="search" name="q" value="{{ query }}" placeholder="Search projects..." autofocus>
     <button type="submit">Search</button>
   </form>
 </div>
 
-{% if query %}
-  {% if results %}
-  <div class="card">
-    <ul>
-      {% for result in results %}
-      <li><a href="{{ url_for('projects.detail', slug=result.slug) }}">{{ result.title }}</a></li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% else %}
-  <div class="card card-empty">
-    <p>No results for "{{ query }}".</p>
-  </div>
+{% if results %}
+<div class="card">
+  {% if not query %}
+  <p class="search-results-heading">All projects ({{ results|length }})</p>
   {% endif %}
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Folder</th>
+        <th>Status</th>
+        <th>Domain</th>
+        <th>Requestor</th>
+        <th>Entity types</th>
+        <th>Aggregation levels</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in results %}
+      <tr>
+        <td><a href="{{ url_for('projects.detail', slug=item.result.slug) }}">{{ item.result.title }}</a></td>
+        <td><code>{{ item.result.slug }}</code></td>
+        <td><span class="badge badge-{{ item.result.status }}">{{ item.result.status }}</span></td>
+        <td>{{ item.result.domain or "" }}</td>
+        <td>{{ item.requestor or "" }}</td>
+        <td>
+          {% if item.entity_types %}
+          <div class="tag-chips">
+            {% for name in item.entity_types %}<span class="tag-chip">{{ name }}</span>{% endfor %}
+          </div>
+          {% endif %}
+        </td>
+        <td>
+          {% if item.aggregation_levels %}
+          <div class="tag-chips">
+            {% for name in item.aggregation_levels %}<span class="tag-chip">{{ name }}</span>{% endfor %}
+          </div>
+          {% endif %}
+        </td>
+        <td>{{ item.result.created_at[:10] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif query %}
+<div class="card card-empty">
+  <p>No results for "{{ query }}".</p>
+</div>
+{% else %}
+<div class="card card-empty">
+  <p>No projects yet.</p>
+</div>
 {% endif %}
 {% endblock %}
