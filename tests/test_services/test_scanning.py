@@ -95,6 +95,15 @@ class TestFindUntrackedFiles:
         assert Path("data.csv") in result
         assert not any("build" in str(p) for p in result)
 
+    def test_skips_project_json(self, tmp_path):
+        """project.json (datapm metadata) should always be ignored."""
+        (tmp_path / "project.json").write_text("{}")
+        (tmp_path / "data.csv").write_text("a,b")
+
+        result = find_untracked_files(tmp_path, set())
+        assert Path("data.csv") in result
+        assert Path("project.json") not in result
+
     def test_results_sorted(self, tmp_path):
         """Results should be in sorted order."""
         (tmp_path / "b.csv").write_text("b")

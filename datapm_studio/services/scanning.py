@@ -10,6 +10,9 @@ DEFAULT_IGNORE_DIRS = {".git", "__pycache__", ".venv", "node_modules", ".mypy_ca
 # File patterns to always skip.
 DEFAULT_IGNORE_SUFFIXES = {".pyc", ".pyo"}
 
+# Specific filenames to always skip (datapm metadata, etc.).
+DEFAULT_IGNORE_FILES = {"project.json"}
+
 
 def find_untracked_files(
     project_path: Path,
@@ -43,8 +46,10 @@ def find_untracked_files(
         if any(part in ignore_dirs for part in child.relative_to(project_path).parts):
             continue
 
-        # Skip ignored file suffixes.
+        # Skip ignored file suffixes and specific filenames.
         if child.suffix in DEFAULT_IGNORE_SUFFIXES:
+            continue
+        if child.name in DEFAULT_IGNORE_FILES:
             continue
 
         rel = child.relative_to(project_path)
