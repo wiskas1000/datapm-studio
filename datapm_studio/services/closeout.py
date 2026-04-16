@@ -5,9 +5,14 @@ from __future__ import annotations
 import sqlite3
 from dataclasses import dataclass
 
-from data_project_manager.db.repositories.data_file import DataFileRepository
+from data_project_manager.db.repositories.data_file import (
+    DataFileAggregationRepository,
+    DataFileEntityTypeRepository,
+    DataFileRepository,
+)
 from data_project_manager.db.repositories.deliverable import DeliverableRepository
 from data_project_manager.db.repositories.person import ProjectPersonRepository
+from data_project_manager.db.repositories.question import RequestQuestionRepository
 
 
 @dataclass
@@ -129,6 +134,47 @@ def analyze_gaps(project, conn: sqlite3.Connection) -> list[Gap]:
                 severity="critical",
                 description=f"{count} data file(s) missing sensitivity classification.",
                 fix_url=None,
+            )
+        )
+
+    # 7b. Data files missing entity types / aggregation levels
+    if data_files:
+        et_repo = DataFileEntityTypeRepository(conn)
+        agg_repo = DataFileAggregationRepository(conn)
+        missing_entity_types = [
+            f for f in data_files if not et_repo.list_for_file(f.id)
+        ]
+        missing_agg_levels = [f for f in data_files if not agg_repo.list_for_file(f.id)]
+        if missing_entity_types:
+            count = len(missing_entity_types)
+            gaps.append(
+                Gap(
+                    category="files",
+                    severity="warning",
+                    description=f"{count} data file(s) missing entity types.",
+                    fix_url=f"/projects/{slug}",
+                )
+            )
+        if missing_agg_levels:
+            count = len(missing_agg_levels)
+            gaps.append(
+                Gap(
+                    category="files",
+                    severity="warning",
+                    description=f"{count} data file(s) missing aggregation levels.",
+                    fix_url=f"/projects/{slug}",
+                )
+            )
+
+    # 7c. No request questions registered
+    questions = RequestQuestionRepository(conn).list_for_project(project.id)
+    if not questions:
+        gaps.append(
+            Gap(
+                category="metadata",
+                severity="warning",
+                description="No request questions registered.",
+                fix_url=f"/projects/{slug}",
             )
         )
 

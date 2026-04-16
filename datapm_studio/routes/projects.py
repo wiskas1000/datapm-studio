@@ -81,6 +81,9 @@ def _form_data() -> dict:
         "estimated_hours": request.form.get("estimated_hours", ""),
         "external_url": request.form.get("external_url", "").strip(),
         "do_git_init": bool(request.form.get("do_git_init")),
+        "questions_text": request.form.get("questions_text", ""),
+        "entity_types_text": request.form.get("entity_types_text", "").strip(),
+        "agg_levels_text": request.form.get("agg_levels_text", "").strip(),
     }
 
 
@@ -220,6 +223,30 @@ def create_project():
         pt_repo = ProjectTagRepository(conn)
         for tag_id in tag_ids:
             pt_repo.add(project_id=project_id, tag_id=tag_id)
+
+    # Create initial request questions (one per non-empty line)
+    if form["questions_text"]:
+        q_repo = RequestQuestionRepository(conn)
+        for line in form["questions_text"].splitlines():
+            text = line.strip()
+            if text:
+                q_repo.create(project_id=project_id, question_text=text)
+
+    # Seed entity-type vocabulary (comma-separated). Deduped by the core repo.
+    if form["entity_types_text"]:
+        et_repo = EntityTypeRepository(conn)
+        for name in form["entity_types_text"].split(","):
+            cleaned = name.strip()
+            if cleaned:
+                et_repo.create(name=cleaned)
+
+    # Seed aggregation-level vocabulary
+    if form["agg_levels_text"]:
+        agg_repo = AggregationLevelRepository(conn)
+        for name in form["agg_levels_text"].split(","):
+            cleaned = name.strip()
+            if cleaned:
+                agg_repo.create(name=cleaned)
 
     flash(f'Created project "{form["title"]}".', "success")
     return redirect(url_for("projects.detail", slug=slug))

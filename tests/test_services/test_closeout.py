@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
-from data_project_manager.db.repositories.data_file import DataFileRepository
+from data_project_manager.db.repositories.data_file import (
+    AggregationLevelRepository,
+    DataFileAggregationRepository,
+    DataFileEntityTypeRepository,
+    DataFileRepository,
+    EntityTypeRepository,
+)
 from data_project_manager.db.repositories.deliverable import DeliverableRepository
 from data_project_manager.db.repositories.person import (
     PersonRepository,
     ProjectPersonRepository,
 )
 from data_project_manager.db.repositories.project import ProjectRepository
+from data_project_manager.db.repositories.question import RequestQuestionRepository
 
 from datapm_studio.services.closeout import Gap, analyze_gaps
 
@@ -239,3 +246,84 @@ class TestAnalyzeGaps:
         for gap in gaps:
             if gap.fix_url is not None:
                 assert "/projects/my-project" in gap.fix_url
+
+    def test_no_request_questions_gap(self, db_conn):
+        """No registered request questions is flagged as a warning."""
+        project = _create_project(db_conn)
+        gaps = analyze_gaps(project, db_conn)
+
+        q_gaps = [g for g in gaps if "No request questions" in g.description]
+        assert len(q_gaps) == 1
+        assert q_gaps[0].severity == "warning"
+
+    def test_request_questions_present_no_gap(self, db_conn):
+        """At least one request question clears the gap."""
+        project = _create_project(db_conn)
+        RequestQuestionRepository(db_conn).create(
+            project_id=project.id, question_text="What is the churn rate?"
+        )
+        gaps = analyze_gaps(project, db_conn)
+        descs = _gap_descriptions(gaps)
+        assert not any("No request questions" in d for d in descs)
+
+    def test_files_missing_entity_types_gap(self, db_conn):
+        """Data files without linked entity types are flagged as a warning."""
+        project = _create_project(db_conn)
+        DataFileRepository(db_conn).create(
+            project_id=project.id,
+            file_path="data/raw.csv",
+            sensitivity="internal",
+        )
+        gaps = analyze_gaps(project, db_conn)
+
+        et_gaps = [g for g in gaps if "missing entity types" in g.description]
+        assert len(et_gaps) == 1
+        assert et_gaps[0].severity == "warning"
+
+    def test_files_with_entity_types_no_gap(self, db_conn):
+        """Linking an entity type clears the entity-type gap for that file."""
+        project = _create_project(db_conn)
+        df = DataFileRepository(db_conn).create(
+            project_id=project.id,
+            file_path="data/raw.csv",
+            sensitivity="internal",
+        )
+        et = EntityTypeRepository(db_conn).create(name="patient")
+        DataFileEntityTypeRepository(db_conn).add(
+            data_file_id=df.id, entity_type_id=et.id
+        )
+
+        gaps = analyze_gaps(project, db_conn)
+        descs = _gap_descriptions(gaps)
+        assert not any("missing entity types" in d for d in descs)
+
+    def test_files_missing_agg_levels_gap(self, db_conn):
+        """Data files without linked aggregation levels are flagged as a warning."""
+        project = _create_project(db_conn)
+        DataFileRepository(db_conn).create(
+            project_id=project.id,
+            file_path="data/raw.csv",
+            sensitivity="internal",
+        )
+        gaps = analyze_gaps(project, db_conn)
+
+        agg_gaps = [g for g in gaps if "missing aggregation levels" in g.description]
+        assert len(agg_gaps) == 1
+        assert agg_gaps[0].severity == "warning"
+
+    def test_files_with_agg_levels_no_gap(self, db_conn):
+        """Linking an aggregation level clears the agg gap for that file."""
+        project = _create_project(db_conn)
+        df = DataFileRepository(db_conn).create(
+            project_id=project.id,
+            file_path="data/raw.csv",
+            sensitivity="internal",
+        )
+        agg = AggregationLevelRepository(db_conn).create(name="biweekly")
+        DataFileAggregationRepository(db_conn).add(
+            data_file_id=df.id, agg_level_id=agg.id
+        )
+
+        gaps = analyze_gaps(project, db_conn)
+        descs = _gap_descriptions(gaps)
+        assert not any("missing aggregation levels" in d for d in descs)
