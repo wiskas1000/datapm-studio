@@ -1,0 +1,67 @@
+{# Inline form for registering a data file to a project. #}
+<form class="inline-add-form"
+      hx-post="{{ url_for('projects.add_data_file', slug=slug) }}"
+      hx-target="#project-data-files"
+      hx-swap="outerHTML">
+  <div class="form-group">
+    <label for="file_path">File path</label>
+    <input type="text" id="file_path" name="file_path"
+           placeholder="data/raw/customers_2026Q1.csv"
+           value="{{ file_path | default('', true) }}" required>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="file_format">Format</label>
+      <input type="text" id="file_format" name="file_format"
+             placeholder="csv, parquet, xlsx…"
+             value="{{ file_format | default('', true) }}">
+    </div>
+    <div class="form-group">
+      <label for="sensitivity">Sensitivity</label>
+      <select id="sensitivity" name="sensitivity">
+        <option value="">— none —</option>
+        <option value="public" {{ 'selected' if sensitivity == 'public' else '' }}>Public</option>
+        <option value="internal" {{ 'selected' if sensitivity == 'internal' else '' }}>Internal</option>
+        <option value="confidential" {{ 'selected' if sensitivity == 'confidential' else '' }}>Confidential</option>
+        <option value="client_confidential" {{ 'selected' if sensitivity == 'client_confidential' else '' }}>Client confidential</option>
+        <option value="strictly_confidential" {{ 'selected' if sensitivity == 'strictly_confidential' else '' }}>Strictly confidential</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>
+        <input type="checkbox" name="is_source" value="1"
+               {{ 'checked' if is_source | default(true, true) else '' }}>
+        Source / input data
+      </label>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="data_period_from">Data period from</label>
+      <input type="date" id="data_period_from" name="data_period_from"
+             value="{{ data_period_from | default('', true) }}">
+    </div>
+    <div class="form-group">
+      <label for="data_period_to">Data period to</label>
+      <input type="date" id="data_period_to" name="data_period_to"
+             value="{{ data_period_to | default('', true) }}">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="retention_date">Retention date</label>
+      <input type="date" id="retention_date" name="retention_date"
+             value="{{ retention_date | default('', true) }}">
+    </div>
+  </div>
+  {% if error %}
+  <p class="form-error">{{ error }}</p>
+  {% endif %}
+  <div class="form-actions-inline">
+    <button type="submit" class="btn btn-primary btn-sm">Register file</button>
+    <button type="button" class="btn btn-secondary btn-sm"
+            onclick="this.closest('#data-file-add-area').innerHTML = ''">Cancel</button>
+  </div>
+</form>

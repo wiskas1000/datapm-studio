@@ -608,6 +608,42 @@ li {
     font-size: 0.8rem;
 }
 
+/* ── Data tables ── */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+    font-weight: 600;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.badge-sensitivity {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: var(--badge-bg, var(--surface-raised));
+    color: var(--badge-text, var(--text));
+}
+
 /* ── Inline Edit ── */
 .btn-inline-edit {
     background: none;
