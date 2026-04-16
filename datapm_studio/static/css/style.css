@@ -547,18 +547,25 @@ li {
     color: inherit;
     cursor: pointer;
     text-align: left;
+    letter-spacing: inherit;
+    text-transform: inherit;
 }
 
 .th-sort::after {
-    content: " ↕";
-    opacity: 0.35;
-    font-size: 0.75em;
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    margin-left: 0.25em;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.15s;
 }
 
-.th-sort[data-dir="asc"]::after { content: " ↑"; opacity: 1; }
-.th-sort[data-dir="desc"]::after { content: " ↓"; opacity: 1; }
+th:hover .th-sort::after { opacity: 0.5; content: "↕"; }
+.th-sort[data-dir="asc"]::after { content: "↑"; opacity: 1; color: var(--text); }
+.th-sort[data-dir="desc"]::after { content: "↓"; opacity: 1; color: var(--text); }
 
-.th-sort:hover { color: var(--accent); }
+.th-sort:hover { color: var(--text); }
 
 .selected-value {
     display: flex;
