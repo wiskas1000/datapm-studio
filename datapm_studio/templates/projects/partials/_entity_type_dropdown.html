@@ -1,0 +1,24 @@
+{# Dropdown results for entity type search. #}
+{% if entity_types %}
+{% for et in entity_types %}
+<button type="button" class="dropdown-item"
+        hx-post="{{ url_for('projects.add_entity_type', slug=slug, file_id=file_id) }}"
+        hx-vals='{"entity_type_id": "{{ et.id }}"}'
+        hx-target="#project-data-files"
+        hx-swap="outerHTML">
+  {{ et.name }}
+</button>
+{% endfor %}
+{% endif %}
+{% if query and not exact_match %}
+<button type="button" class="dropdown-item dropdown-item-create"
+        hx-post="{{ url_for('projects.create_and_add_entity_type', slug=slug, file_id=file_id) }}"
+        hx-vals='{"name": "{{ query }}"}'
+        hx-target="#project-data-files"
+        hx-swap="outerHTML">
+  Create "{{ query }}"
+</button>
+{% endif %}
+{% if not entity_types and not query %}
+<div class="dropdown-item" style="color: var(--text-muted);">Type to search…</div>
+{% endif %}

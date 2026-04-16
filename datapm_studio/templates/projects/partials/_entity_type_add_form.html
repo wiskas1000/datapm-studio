@@ -1,0 +1,11 @@
+{# Inline form for adding an entity type to a data file. #}
+<span class="inline-lookup-form">
+  <input type="text" name="q" placeholder="Search entity types…"
+         class="input-sm"
+         hx-get="{{ url_for('projects.search_entity_types', slug=slug, file_id=file_id) }}"
+         hx-trigger="keyup changed delay:300ms"
+         hx-target="#et-dropdown-{{ file_id }}"
+         hx-swap="innerHTML"
+         autocomplete="off">
+  <div id="et-dropdown-{{ file_id }}" class="lookup-dropdown"></div>
+</span>

@@ -1,0 +1,11 @@
+{# Inline form for adding an aggregation level to a data file. #}
+<span class="inline-lookup-form">
+  <input type="text" name="q" placeholder="Search aggregation levels…"
+         class="input-sm"
+         hx-get="{{ url_for('projects.search_agg_levels', slug=slug, file_id=file_id) }}"
+         hx-trigger="keyup changed delay:300ms"
+         hx-target="#agg-dropdown-{{ file_id }}"
+         hx-swap="innerHTML"
+         autocomplete="off">
+  <div id="agg-dropdown-{{ file_id }}" class="lookup-dropdown"></div>
+</span>

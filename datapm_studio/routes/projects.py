@@ -21,7 +21,13 @@ from data_project_manager.db.repositories.project import (
     ProjectRepository,
     ProjectRootRepository,
 )
-from data_project_manager.db.repositories.data_file import DataFileRepository
+from data_project_manager.db.repositories.data_file import (
+    AggregationLevelRepository,
+    DataFileAggregationRepository,
+    DataFileEntityTypeRepository,
+    DataFileRepository,
+    EntityTypeRepository,
+)
 from data_project_manager.db.repositories.question import RequestQuestionRepository
 from data_project_manager.db.repositories.tag import ProjectTagRepository, TagRepository
 
@@ -239,8 +245,12 @@ def detail(slug):
     # Fetch request questions
     questions = RequestQuestionRepository(conn).list_for_project(project.id)
 
-    # Fetch data files
+    # Fetch data files with their entity types and aggregation levels
     data_files = DataFileRepository(conn).list_for_project(project.id)
+    et_repo = DataFileEntityTypeRepository(conn)
+    agg_repo = DataFileAggregationRepository(conn)
+    file_entity_types = {f.id: et_repo.list_for_file(f.id) for f in data_files}
+    file_agg_levels = {f.id: agg_repo.list_for_file(f.id) for f in data_files}
 
     # Fetch project root name
     root = None
@@ -254,6 +264,8 @@ def detail(slug):
         tags=tags,
         questions=questions,
         data_files=data_files,
+        file_entity_types=file_entity_types,
+        file_agg_levels=file_agg_levels,
         root=root,
     )
 
@@ -736,10 +748,16 @@ def _render_data_files_section(project):
     """Render the data files section partial."""
     conn = _get_conn()
     data_files = DataFileRepository(conn).list_for_project(project.id)
+    et_repo = DataFileEntityTypeRepository(conn)
+    agg_repo = DataFileAggregationRepository(conn)
+    file_entity_types = {f.id: et_repo.list_for_file(f.id) for f in data_files}
+    file_agg_levels = {f.id: agg_repo.list_for_file(f.id) for f in data_files}
     return render_template(
         "projects/partials/_data_files_section.html",
         project=project,
         data_files=data_files,
+        file_entity_types=file_entity_types,
+        file_agg_levels=file_agg_levels,
     )
 
 
@@ -791,4 +809,183 @@ def add_data_file(slug):
         data_period_to=data_period_to,
         retention_date=retention_date,
     )
+    return _render_data_files_section(project)
+
+
+# ── Entity type management per data file ──
+
+
+def _get_data_file_or_404(file_id: str):
+    """Get a data file by ID or abort 404."""
+    from flask import abort
+
+    conn = _get_conn()
+    data_file = DataFileRepository(conn).get(file_id)
+    if data_file is None:
+        abort(404)
+    return data_file
+
+
+@bp.route("/<slug>/data-files/<file_id>/entity-types/add-form")
+def add_entity_type_form(slug, file_id):
+    """Return the inline search form for adding an entity type to a file."""
+    _ = _get_project_or_404(slug)
+    _ = _get_data_file_or_404(file_id)
+    return render_template(
+        "projects/partials/_entity_type_add_form.html",
+        slug=slug,
+        file_id=file_id,
+    )
+
+
+@bp.route("/<slug>/data-files/<file_id>/entity-types/search")
+def search_entity_types(slug, file_id):
+    """HTMX endpoint: entity type search dropdown."""
+    q = request.args.get("q", "").strip().lower()
+    conn = _get_conn()
+    all_types = EntityTypeRepository(conn).list()
+
+    if q:
+        entity_types = [et for et in all_types if q in et.name.lower()]
+    else:
+        entity_types = all_types
+
+    exact_match = any(et.name == q for et in entity_types) if q else True
+
+    return render_template(
+        "projects/partials/_entity_type_dropdown.html",
+        entity_types=entity_types,
+        query=q,
+        exact_match=exact_match,
+        slug=slug,
+        file_id=file_id,
+    )
+
+
+@bp.route("/<slug>/data-files/<file_id>/entity-types/add", methods=["POST"])
+def add_entity_type(slug, file_id):
+    """Link an existing entity type to a data file."""
+    project = _get_project_or_404(slug)
+    _ = _get_data_file_or_404(file_id)
+
+    entity_type_id = request.form.get("entity_type_id", "").strip()
+    if entity_type_id:
+        conn = _get_conn()
+        DataFileEntityTypeRepository(conn).add(
+            data_file_id=file_id, entity_type_id=entity_type_id
+        )
+    return _render_data_files_section(project)
+
+
+@bp.route("/<slug>/data-files/<file_id>/entity-types/create-and-add", methods=["POST"])
+def create_and_add_entity_type(slug, file_id):
+    """Create a new entity type and link it to a data file."""
+    project = _get_project_or_404(slug)
+    _ = _get_data_file_or_404(file_id)
+
+    name = request.form.get("name", "").strip()
+    if name:
+        conn = _get_conn()
+        et = EntityTypeRepository(conn).create(name=name)
+        DataFileEntityTypeRepository(conn).add(
+            data_file_id=file_id, entity_type_id=et.id
+        )
+    return _render_data_files_section(project)
+
+
+@bp.route("/<slug>/data-files/<file_id>/entity-types/remove", methods=["POST"])
+def remove_entity_type(slug, file_id):
+    """Remove an entity type from a data file."""
+    project = _get_project_or_404(slug)
+
+    entity_type_id = request.form.get("entity_type_id", "").strip()
+    if entity_type_id:
+        conn = _get_conn()
+        DataFileEntityTypeRepository(conn).remove(
+            data_file_id=file_id, entity_type_id=entity_type_id
+        )
+    return _render_data_files_section(project)
+
+
+# ── Aggregation level management per data file ──
+
+
+@bp.route("/<slug>/data-files/<file_id>/agg-levels/add-form")
+def add_agg_level_form(slug, file_id):
+    """Return the inline search form for adding an aggregation level to a file."""
+    _ = _get_project_or_404(slug)
+    _ = _get_data_file_or_404(file_id)
+    return render_template(
+        "projects/partials/_agg_level_add_form.html",
+        slug=slug,
+        file_id=file_id,
+    )
+
+
+@bp.route("/<slug>/data-files/<file_id>/agg-levels/search")
+def search_agg_levels(slug, file_id):
+    """HTMX endpoint: aggregation level search dropdown."""
+    q = request.args.get("q", "").strip().lower()
+    conn = _get_conn()
+    all_levels = AggregationLevelRepository(conn).list()
+
+    if q:
+        agg_levels = [al for al in all_levels if q in al.name.lower()]
+    else:
+        agg_levels = all_levels
+
+    exact_match = any(al.name == q for al in agg_levels) if q else True
+
+    return render_template(
+        "projects/partials/_agg_level_dropdown.html",
+        agg_levels=agg_levels,
+        query=q,
+        exact_match=exact_match,
+        slug=slug,
+        file_id=file_id,
+    )
+
+
+@bp.route("/<slug>/data-files/<file_id>/agg-levels/add", methods=["POST"])
+def add_agg_level(slug, file_id):
+    """Link an existing aggregation level to a data file."""
+    project = _get_project_or_404(slug)
+    _ = _get_data_file_or_404(file_id)
+
+    agg_level_id = request.form.get("agg_level_id", "").strip()
+    if agg_level_id:
+        conn = _get_conn()
+        DataFileAggregationRepository(conn).add(
+            data_file_id=file_id, agg_level_id=agg_level_id
+        )
+    return _render_data_files_section(project)
+
+
+@bp.route("/<slug>/data-files/<file_id>/agg-levels/create-and-add", methods=["POST"])
+def create_and_add_agg_level(slug, file_id):
+    """Create a new aggregation level and link it to a data file."""
+    project = _get_project_or_404(slug)
+    _ = _get_data_file_or_404(file_id)
+
+    name = request.form.get("name", "").strip()
+    if name:
+        conn = _get_conn()
+        agg = AggregationLevelRepository(conn).create(name=name)
+        DataFileAggregationRepository(conn).add(
+            data_file_id=file_id, agg_level_id=agg.id
+        )
+    return _render_data_files_section(project)
+
+
+@bp.route("/<slug>/data-files/<file_id>/agg-levels/remove", methods=["POST"])
+def remove_agg_level(slug, file_id):
+    """Remove an aggregation level from a data file."""
+    project = _get_project_or_404(slug)
+
+    agg_level_id = request.form.get("agg_level_id", "").strip()
+    if agg_level_id:
+        conn = _get_conn()
+        DataFileAggregationRepository(conn).remove(
+            data_file_id=file_id, agg_level_id=agg_level_id
+        )
     return _render_data_files_section(project)
