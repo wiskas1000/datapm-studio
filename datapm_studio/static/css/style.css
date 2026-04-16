@@ -51,6 +51,56 @@
     color-scheme: light;
 }
 
+/* Catppuccin palettes — https://github.com/catppuccin/catppuccin (MIT).
+   See static/css/LICENSE.catppuccin for the palette attribution. */
+[data-theme="mocha"] {
+    --bg: #1e1e2e;
+    --bg-card: #313244;
+    --bg-card-hover: #45475a;
+    --bg-surface: #181825;
+    --border: #45475a;
+    --border-light: #585b70;
+    --text: #cdd6f4;
+    --text-muted: #a6adc8;
+    --text-dim: #6c7086;
+    --accent: #89b4fa;
+    --accent-dim: rgba(137, 180, 250, 0.15);
+    --accent-hover: #b4befe;
+    --green: #a6e3a1;
+    --green-dim: rgba(166, 227, 161, 0.12);
+    --red: #f38ba8;
+    --red-dim: rgba(243, 139, 168, 0.12);
+    --blue: #89b4fa;
+    --blue-dim: rgba(137, 180, 250, 0.12);
+    --orange: #fab387;
+    --orange-dim: rgba(250, 179, 135, 0.12);
+    color-scheme: dark;
+}
+
+[data-theme="latte"] {
+    --bg: #eff1f5;
+    --bg-card: #ffffff;
+    --bg-card-hover: #e6e9ef;
+    --bg-surface: #e6e9ef;
+    --border: #ccd0da;
+    --border-light: #bcc0cc;
+    --text: #4c4f69;
+    --text-muted: #5c5f77;
+    --text-dim: #9ca0b0;
+    --accent: #1e66f5;
+    --accent-dim: rgba(30, 102, 245, 0.12);
+    --accent-hover: #7287fd;
+    --green: #40a02b;
+    --green-dim: rgba(64, 160, 43, 0.1);
+    --red: #d20f39;
+    --red-dim: rgba(210, 15, 57, 0.08);
+    --blue: #1e66f5;
+    --blue-dim: rgba(30, 102, 245, 0.08);
+    --orange: #fe640b;
+    --orange-dim: rgba(254, 100, 11, 0.08);
+    color-scheme: light;
+}
+
 /* ── Reset ── */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -815,12 +865,15 @@ body.htmx-request #htmx-progress,
     font-size: 0.75rem;
     font-weight: 500;
     font-family: inherit;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: color 0.15s;
+    opacity: 0.45;
+    transition: color 0.15s, opacity 0.15s;
 }
 
-.btn-inline-edit:hover {
+.btn-inline-edit:hover,
+.btn-inline-edit:focus-visible,
+:is(dl, tr, li, .card, .data-file-row):hover > .btn-inline-edit,
+:is(dl, tr, li, .card, .data-file-row):hover .btn-inline-edit {
+    opacity: 1;
     color: var(--accent);
 }
 
@@ -997,10 +1050,12 @@ body.htmx-request #htmx-progress,
 }
 .theme-toggle svg { width: 18px; height: 18px; }
 
-[data-theme="light"] .icon-moon { display: none; }
-[data-theme="light"] .icon-sun { display: block; }
-:root .icon-sun, [data-theme="dark"] .icon-sun { display: none; }
-:root .icon-moon, [data-theme="dark"] .icon-moon { display: block; }
+.icon-sun, .icon-moon { display: none; }
+:root .icon-moon,
+[data-theme="dark"] .icon-moon,
+[data-theme="mocha"] .icon-moon { display: block; }
+[data-theme="light"] .icon-sun,
+[data-theme="latte"] .icon-sun { display: block; }
 
 /* ── Close-out Checklist ── */
 .closeout-list {
