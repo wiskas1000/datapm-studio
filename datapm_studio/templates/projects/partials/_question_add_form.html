@@ -1,0 +1,35 @@
+{# Inline form for adding a request question to a project. #}
+<form class="inline-add-form"
+      hx-post="{{ url_for('projects.add_question', slug=slug) }}"
+      hx-target="#project-questions"
+      hx-swap="outerHTML">
+  <div class="form-group">
+    <label for="question_text">Question</label>
+    <textarea id="question_text" name="question_text" rows="2"
+              placeholder="What analytical question does this project answer?"
+              required>{{ question_text | default("", true) }}</textarea>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="data_period_from">Data period from</label>
+      <input type="date" id="data_period_from" name="data_period_from"
+             value="{{ data_period_from | default('', true) }}">
+    </div>
+    <div class="form-group">
+      <label for="data_period_to">Data period to</label>
+      <input type="date" id="data_period_to" name="data_period_to"
+             value="{{ data_period_to | default('', true) }}">
+    </div>
+  </div>
+  {% if error %}
+  <p class="form-error">{{ error }}</p>
+  {% endif %}
+  <div class="form-actions-inline">
+    <button type="submit" class="btn btn-primary btn-sm">Add question</button>
+    <button type="button" class="btn btn-secondary btn-sm"
+            hx-get="{{ url_for('projects.add_question_form', slug=slug) }}"
+            hx-target="#question-add-area"
+            hx-swap="innerHTML"
+            onclick="this.closest('#question-add-area').innerHTML = ''">Cancel</button>
+  </div>
+</form>

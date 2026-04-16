@@ -21,6 +21,7 @@ from data_project_manager.db.repositories.project import (
     ProjectRepository,
     ProjectRootRepository,
 )
+from data_project_manager.db.repositories.question import RequestQuestionRepository
 from data_project_manager.db.repositories.tag import ProjectTagRepository, TagRepository
 
 bp = Blueprint("projects", __name__, url_prefix="/projects")
@@ -234,6 +235,9 @@ def detail(slug):
     # Fetch linked tags
     tags = ProjectTagRepository(conn).list_for_project(project.id)
 
+    # Fetch request questions
+    questions = RequestQuestionRepository(conn).list_for_project(project.id)
+
     # Fetch project root name
     root = None
     if project.root_id:
@@ -244,6 +248,7 @@ def detail(slug):
         project=project,
         persons=persons,
         tags=tags,
+        questions=questions,
         root=root,
     )
 
@@ -664,3 +669,56 @@ def remove_tag(slug):
         conn = _get_conn()
         ProjectTagRepository(conn).remove(project_id=project.id, tag_id=tag_id)
     return _render_tags_section(project)
+
+
+# ── Request question management ──
+
+
+def _render_questions_section(project):
+    """Render the questions section partial."""
+    conn = _get_conn()
+    questions = RequestQuestionRepository(conn).list_for_project(project.id)
+    return render_template(
+        "projects/partials/_questions_section.html",
+        project=project,
+        questions=questions,
+    )
+
+
+@bp.route("/<slug>/questions/add-form")
+def add_question_form(slug):
+    """Return the inline form for adding a request question."""
+    _ = _get_project_or_404(slug)
+    return render_template(
+        "projects/partials/_question_add_form.html",
+        slug=slug,
+    )
+
+
+@bp.route("/<slug>/questions/add", methods=["POST"])
+def add_question(slug):
+    """Add a request question to a project."""
+    project = _get_project_or_404(slug)
+
+    question_text = request.form.get("question_text", "").strip()
+    data_period_from = request.form.get("data_period_from", "").strip() or None
+    data_period_to = request.form.get("data_period_to", "").strip() or None
+
+    if not question_text:
+        return render_template(
+            "projects/partials/_question_add_form.html",
+            slug=slug,
+            question_text=question_text,
+            data_period_from=data_period_from or "",
+            data_period_to=data_period_to or "",
+            error="Question text is required.",
+        )
+
+    conn = _get_conn()
+    RequestQuestionRepository(conn).create(
+        project_id=project.id,
+        question_text=question_text,
+        data_period_from=data_period_from,
+        data_period_to=data_period_to,
+    )
+    return _render_questions_section(project)
