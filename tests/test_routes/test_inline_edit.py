@@ -83,21 +83,28 @@ class TestEditFieldPost:
 
     def test_update_status(self, client, db_conn):
         slug = _seed_project(db_conn)
-        resp = client.post(
-            f"/projects/{slug}/edit/status", data={"value": "done"}
-        )
+        resp = client.post(f"/projects/{slug}/edit/status", data={"value": "paused"})
         assert resp.status_code == 200
-        assert b"done" in resp.data
+        assert b"paused" in resp.data
 
         # Verify persisted
+        project = ProjectRepository(db_conn).get_by_slug(slug)
+        assert project.status == "paused"
+
+    def test_update_status_to_done_redirects_to_closeout(self, client, db_conn):
+        """Setting status to 'done' should redirect to the close-out checklist."""
+        slug = _seed_project(db_conn)
+        resp = client.post(f"/projects/{slug}/edit/status", data={"value": "done"})
+        assert resp.status_code == 200
+        assert resp.headers.get("HX-Redirect") == f"/projects/{slug}/closeout"
+
+        # Verify status was still persisted
         project = ProjectRepository(db_conn).get_by_slug(slug)
         assert project.status == "done"
 
     def test_update_domain(self, client, db_conn):
         slug = _seed_project(db_conn)
-        resp = client.post(
-            f"/projects/{slug}/edit/domain", data={"value": "analytics"}
-        )
+        resp = client.post(f"/projects/{slug}/edit/domain", data={"value": "analytics"})
         assert resp.status_code == 200
         assert b"analytics" in resp.data
 
@@ -152,9 +159,7 @@ class TestEditFieldPost:
 
     def test_clear_field_to_none(self, client, db_conn):
         slug = _seed_project(db_conn)
-        resp = client.post(
-            f"/projects/{slug}/edit/domain", data={"value": ""}
-        )
+        resp = client.post(f"/projects/{slug}/edit/domain", data={"value": ""})
         assert resp.status_code == 200
 
         project = ProjectRepository(db_conn).get_by_slug(slug)
@@ -213,9 +218,7 @@ class TestDateValidation:
 
     def test_clear_date_allowed(self, client, db_conn):
         slug = _seed_project(db_conn)
-        resp = client.post(
-            f"/projects/{slug}/edit/expected_end", data={"value": ""}
-        )
+        resp = client.post(f"/projects/{slug}/edit/expected_end", data={"value": ""})
         assert resp.status_code == 200
 
         project = ProjectRepository(db_conn).get_by_slug(slug)

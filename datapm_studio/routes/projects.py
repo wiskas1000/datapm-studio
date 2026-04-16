@@ -349,6 +349,14 @@ def edit_field(slug, field):
 
     repo.update(project.id, **{field: save_value})
 
+    # When status is set to "done", redirect to the close-out checklist
+    if field == "status" and save_value == "done":
+        from flask import make_response
+
+        resp = make_response("")
+        resp.headers["HX-Redirect"] = url_for("closeout.checklist", slug=slug)
+        return resp
+
     # Re-fetch project to get updated value
     project = repo.get_by_slug(slug)
 
