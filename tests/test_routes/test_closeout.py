@@ -139,6 +139,126 @@ class TestMarkDone:
         assert resp.status_code == 404
 
 
+class TestInlineFixFields:
+    """Tests for inline fix of scalar fields on the closeout page."""
+
+    def test_fix_form_description(self, client, db_conn):
+        """GET fix form for description returns a textarea."""
+        _create_project(db_conn)
+        resp = client.get("/projects/test-closeout/closeout/fix/description")
+        assert resp.status_code == 200
+        assert b"<textarea" in resp.data
+
+    def test_fix_form_realized_start(self, client, db_conn):
+        """GET fix form for realized_start returns a date input."""
+        _create_project(db_conn)
+        resp = client.get("/projects/test-closeout/closeout/fix/realized_start")
+        assert resp.status_code == 200
+        assert b'type="date"' in resp.data
+
+    def test_fix_form_invalid_field(self, client, db_conn):
+        """Unknown field should return 400."""
+        _create_project(db_conn)
+        resp = client.get("/projects/test-closeout/closeout/fix/nonexistent")
+        assert resp.status_code == 400
+
+    def test_fix_save_description(self, client, db_conn):
+        """POST fix for description saves and returns updated checklist."""
+        _create_project(db_conn)
+        resp = client.post(
+            "/projects/test-closeout/closeout/fix/description",
+            data={"value": "A proper description"},
+        )
+        assert resp.status_code == 200
+        # The returned checklist should no longer show the description gap
+        assert b"No description set" not in resp.data
+
+        project = ProjectRepository(db_conn).get_by_slug("test-closeout")
+        assert project.description == "A proper description"
+
+    def test_fix_save_realized_end(self, client, db_conn):
+        """POST fix for realized_end saves and clears that gap."""
+        _create_project(db_conn)
+        resp = client.post(
+            "/projects/test-closeout/closeout/fix/realized_end",
+            data={"value": "2026-04-16"},
+        )
+        assert resp.status_code == 200
+        assert b"Realized end date not set" not in resp.data
+
+        project = ProjectRepository(db_conn).get_by_slug("test-closeout")
+        assert project.realized_end == "2026-04-16"
+
+    def test_fix_save_invalid_field(self, client, db_conn):
+        """POST fix for unknown field should return 400."""
+        _create_project(db_conn)
+        resp = client.post(
+            "/projects/test-closeout/closeout/fix/nonexistent",
+            data={"value": "anything"},
+        )
+        assert resp.status_code == 400
+
+    def test_checklist_shows_fix_buttons(self, client, db_conn):
+        """Gaps with fix_field should show Fix buttons (not links)."""
+        _create_project(db_conn)
+        resp = client.get("/projects/test-closeout/closeout")
+        assert b"closeout-fix-btn" in resp.data
+
+
+class TestInlineFixRequestor:
+    """Tests for inline requestor fix on the closeout page."""
+
+    def test_requestor_form_shows_search(self, client, db_conn):
+        """GET requestor fix form shows search input."""
+        _create_project(db_conn)
+        resp = client.get("/projects/test-closeout/closeout/fix/requestor")
+        assert resp.status_code == 200
+        assert b"Search people" in resp.data
+
+    def test_requestor_form_with_selection(self, client, db_conn):
+        """GET requestor fix with person_id shows selected person."""
+        _create_project(db_conn)
+        person = PersonRepository(db_conn).create(first_name="Alice", last_name="Smith")
+        resp = client.get(
+            f"/projects/test-closeout/closeout/fix/requestor?person_id={person.id}"
+        )
+        assert resp.status_code == 200
+        assert b"Alice Smith" in resp.data
+        assert b"Add as requestor" in resp.data
+
+    def test_requestor_search(self, client, db_conn):
+        """Search endpoint returns matching persons."""
+        _create_project(db_conn)
+        PersonRepository(db_conn).create(first_name="Alice", last_name="Smith")
+        resp = client.get(
+            "/projects/test-closeout/closeout/fix/requestor/search?q=alice"
+        )
+        assert resp.status_code == 200
+        assert b"Alice" in resp.data
+
+    def test_requestor_save(self, client, db_conn):
+        """POST saves the requestor and returns updated checklist."""
+        _create_project(db_conn)
+        person = PersonRepository(db_conn).create(first_name="Alice", last_name="Smith")
+        resp = client.post(
+            "/projects/test-closeout/closeout/fix/requestor",
+            data={"person_id": person.id},
+        )
+        assert resp.status_code == 200
+        # The returned checklist should no longer show the requestor gap
+        assert b"No requestor linked" not in resp.data
+
+    def test_requestor_save_empty_returns_form(self, client, db_conn):
+        """POST with no person_id returns the form again."""
+        _create_project(db_conn)
+        resp = client.post(
+            "/projects/test-closeout/closeout/fix/requestor",
+            data={"person_id": ""},
+        )
+        assert resp.status_code == 200
+        assert b"Search people" in resp.data
+
+
 class TestProjectDetailCloseoutLink:
     """Test that the project detail page links to the closeout checklist."""
 

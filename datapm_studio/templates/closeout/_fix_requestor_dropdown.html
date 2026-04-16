@@ -1,0 +1,17 @@
+{% if persons %}
+{% for person in persons %}
+<button type="button" class="dropdown-item"
+        hx-get="{{ url_for('closeout.fix_requestor_form', slug=slug, person_id=person.id) }}"
+        hx-target="#closeout-content"
+        hx-swap="outerHTML">
+  {{ person.first_name }} {{ person.last_name }}
+  {% if person.function_title or person.department %}
+  <span class="dropdown-item-hint">
+    {{ person.function_title or "" }}{% if person.function_title and person.department %} · {% endif %}{{ person.department or "" }}
+  </span>
+  {% endif %}
+</button>
+{% endfor %}
+{% else %}
+<div class="dropdown-item" style="color: var(--text-muted);">No results</div>
+{% endif %}

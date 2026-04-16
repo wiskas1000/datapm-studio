@@ -860,6 +860,40 @@ li {
     letter-spacing: 0.05em;
 }
 
+.closeout-fix-btn {
+    background: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    cursor: pointer;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    font-family: inherit;
+    font-weight: 500;
+    margin-left: 0.5rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.closeout-fix-btn:hover {
+    background: var(--accent-dim);
+}
+
+.closeout-fix-form {
+    margin-top: 0.5rem;
+}
+
+.closeout-fix-form textarea,
+.closeout-fix-form input {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.closeout-fix-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
 .closeout-all-clear {
     display: flex;
     align-items: center;

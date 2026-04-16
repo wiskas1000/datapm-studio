@@ -18,6 +18,7 @@ class Gap:
     severity: str  # "critical" or "warning"
     description: str  # human-readable explanation
     fix_url: str | None  # relative URL to fix this gap (for links)
+    fix_field: str | None = None  # field name for inline fix (e.g. "description")
 
 
 def analyze_gaps(project, conn: sqlite3.Connection) -> list[Gap]:
@@ -41,6 +42,7 @@ def analyze_gaps(project, conn: sqlite3.Connection) -> list[Gap]:
                 severity="warning",
                 description="No description set.",
                 fix_url=f"/projects/{slug}",
+                fix_field="description",
             )
         )
 
@@ -54,6 +56,7 @@ def analyze_gaps(project, conn: sqlite3.Connection) -> list[Gap]:
                 severity="critical",
                 description="No requestor linked to this project.",
                 fix_url=f"/projects/{slug}",
+                fix_field="requestor",
             )
         )
 
@@ -65,6 +68,7 @@ def analyze_gaps(project, conn: sqlite3.Connection) -> list[Gap]:
                 severity="warning",
                 description="Realized start date not set.",
                 fix_url=f"/projects/{slug}",
+                fix_field="realized_start",
             )
         )
     if not project.realized_end:
@@ -74,6 +78,7 @@ def analyze_gaps(project, conn: sqlite3.Connection) -> list[Gap]:
                 severity="warning",
                 description="Realized end date not set.",
                 fix_url=f"/projects/{slug}",
+                fix_field="realized_end",
             )
         )
 

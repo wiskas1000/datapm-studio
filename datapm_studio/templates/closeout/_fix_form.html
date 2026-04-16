@@ -1,0 +1,23 @@
+<div id="closeout-content">
+<div class="card">
+  <h2>Fix: {{ field | replace("_", " ") | title }}</h2>
+  <form class="closeout-fix-form"
+        hx-post="{{ url_for('closeout.fix_field_save', slug=slug, field=field) }}"
+        hx-target="#closeout-content"
+        hx-swap="outerHTML">
+    {% if field == "description" %}
+    <textarea name="value" rows="3" placeholder="Enter a project description">{{ value or "" }}</textarea>
+    {% elif field in ("realized_start", "realized_end") %}
+    <input type="date" name="value" value="{{ value or '' }}">
+    {% endif %}
+    <div class="closeout-fix-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm"
+              hx-get="{{ url_for('closeout.checklist', slug=slug) }}"
+              hx-target="#closeout-content"
+              hx-swap="outerHTML"
+              hx-select="#closeout-content">Cancel</button>
+    </div>
+  </form>
+</div>
+</div>
