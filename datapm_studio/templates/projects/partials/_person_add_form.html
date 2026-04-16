@@ -1,0 +1,58 @@
+{# Inline form to add a person to a project. #}
+<div class="inline-add-form" id="person-add-form">
+  {% if error %}
+  <p class="inline-edit-error">{{ error }}</p>
+  {% endif %}
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Person</label>
+      {% if selected_person %}
+      <div class="selected-value">
+        <span>{{ selected_person.first_name }} {{ selected_person.last_name }}</span>
+        <button type="button" class="btn-clear"
+                hx-get="{{ url_for('projects.add_person_form', slug=slug) }}"
+                hx-target="#person-add-form"
+                hx-swap="outerHTML"
+                title="Clear">&times;</button>
+      </div>
+      {% else %}
+      <input type="search" placeholder="Search people..."
+             hx-get="{{ url_for('projects.search_person_for_detail', slug=slug) }}"
+             hx-trigger="keyup changed delay:300ms, focus"
+             hx-target="#detail-person-results"
+             hx-include="this"
+             name="q"
+             autocomplete="off">
+      <div id="detail-person-results" class="dropdown-results"></div>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      <label for="add-person-role">Role</label>
+      <input type="text" id="add-person-role" name="role" value="{{ role or 'requestor' }}"
+             form="person-link-form"
+             placeholder="e.g. requestor, analyst">
+    </div>
+  </div>
+
+  {% if selected_person %}
+  <form id="person-link-form"
+        hx-post="{{ url_for('projects.add_person', slug=slug) }}"
+        hx-target="#project-persons"
+        hx-swap="outerHTML">
+    <input type="hidden" name="person_id" value="{{ selected_person.id }}">
+    <input type="hidden" name="role" value="{{ role or 'requestor' }}" id="person-role-hidden">
+    <div class="inline-edit-actions">
+      <button type="submit" class="btn btn-primary btn-sm"
+              onclick="this.form.querySelector('[name=role]').value=document.getElementById('add-person-role').value">Add person</button>
+      <button type="button" class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('person-add-area').innerHTML=''">Cancel</button>
+    </div>
+  </form>
+  {% else %}
+  <div class="inline-edit-actions">
+    <button type="button" class="btn btn-secondary btn-sm"
+            onclick="document.getElementById('person-add-area').innerHTML=''">Cancel</button>
+  </div>
+  {% endif %}
+</div>

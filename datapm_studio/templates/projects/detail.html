@@ -51,33 +51,9 @@
   </dl>
 </div>
 
-{% if persons %}
-<div class="card">
-  <h2>People</h2>
-  <dl class="detail-grid">
-    {% for p in persons %}
-    <dt>{{ p.role | capitalize }}</dt>
-    <dd>
-      {{ p.first_name }} {{ p.last_name }}
-      {% if p.function_title %}
-      <span class="text-muted">— {{ p.function_title }}</span>
-      {% endif %}
-    </dd>
-    {% endfor %}
-  </dl>
-</div>
-{% endif %}
+{% include "projects/partials/_persons_section.html" %}
 
-{% if tags %}
-<div class="card">
-  <h2>Tags</h2>
-  <div class="tag-chips">
-    {% for tag in tags %}
-    <span class="tag-chip">{{ tag.name }}</span>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
+{% include "projects/partials/_tags_section.html" %}
 
 <div class="card">
   <h2>Dates</h2>

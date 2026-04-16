@@ -1,9 +1,11 @@
 {# Read-mode partial for the description card. #}
+{% set _slug = slug if slug is defined else project.slug %}
 <div id="field-description">
   <div class="card-header-row">
     <h2>Description</h2>
+    <span class="flex-spacer"></span>
     <button class="btn-inline-edit"
-            hx-get="{{ url_for('projects.edit_field', slug=slug, field='description') }}"
+            hx-get="{{ url_for('projects.edit_field', slug=_slug, field='description') }}"
             hx-target="#field-description"
             hx-swap="outerHTML">Edit</button>
   </div>

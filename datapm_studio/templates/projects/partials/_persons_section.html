@@ -1,0 +1,35 @@
+{# Persons section for project detail — shows linked persons with add/remove. #}
+<div id="project-persons" class="card">
+  <div class="card-header-row">
+    <h2>People</h2>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="{{ url_for('projects.add_person_form', slug=project.slug) }}"
+            hx-target="#person-add-area"
+            hx-swap="innerHTML">+ Add</button>
+  </div>
+
+  {% if persons %}
+  <dl class="detail-grid">
+    {% for p in persons %}
+    <dt>{{ p.role | capitalize }}</dt>
+    <dd class="inline-edit-row-dd">
+      {{ p.first_name }} {{ p.last_name }}
+      {% if p.function_title %}
+      <span class="text-muted">— {{ p.function_title }}</span>
+      {% endif %}
+      <button class="btn-inline-edit btn-remove-link"
+              hx-post="{{ url_for('projects.remove_person', slug=project.slug) }}"
+              hx-vals='{"person_id": "{{ p.id }}", "role": "{{ p.role }}"}'
+              hx-target="#project-persons"
+              hx-swap="outerHTML"
+              hx-confirm="Remove {{ p.first_name }} {{ p.last_name }} as {{ p.role }}?"
+              title="Remove">&times;</button>
+    </dd>
+    {% endfor %}
+  </dl>
+  {% else %}
+  <p class="text-muted">No people linked yet.</p>
+  {% endif %}
+
+  <div id="person-add-area"></div>
+</div>
