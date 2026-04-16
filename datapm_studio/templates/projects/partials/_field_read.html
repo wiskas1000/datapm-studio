@@ -1,12 +1,13 @@
 {# Generic read-mode partial for a single project field.
-   Variables: slug, field, label, value, display (optional formatted value) #}
+   Variables: field, label, value, display (optional formatted value)
+   Uses project.slug from parent context when slug is not explicitly set. #}
+{% set _slug = slug if slug is defined else project.slug %}
 <div id="field-{{ field }}" class="inline-edit-row">
   <dt>{{ label }}</dt>
-  <dd>
+  <dd class="inline-edit-dd">
+    <span class="inline-edit-value">
     {% if field == "external_url" and value %}
     <a href="{{ value }}">{{ value }}</a>
-    {% elif field == "status" %}
-    <span class="badge badge-{{ value }}">{{ value }}</span>
     {% elif display is defined and display %}
     {{ display }}
     {% elif value %}
@@ -14,8 +15,9 @@
     {% else %}
     <span class="text-muted">--</span>
     {% endif %}
+    </span>
     <button class="btn-inline-edit"
-            hx-get="{{ url_for('projects.edit_field', slug=slug, field=field) }}"
+            hx-get="{{ url_for('projects.edit_field', slug=_slug, field=field) }}"
             hx-target="#field-{{ field }}"
             hx-swap="outerHTML">Edit</button>
   </dd>

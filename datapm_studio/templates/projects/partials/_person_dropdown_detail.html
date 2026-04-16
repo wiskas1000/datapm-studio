@@ -1,0 +1,15 @@
+{# Person dropdown for project detail — clicking selects the person. #}
+{% for person in persons %}
+<button type="button" class="dropdown-item"
+        hx-get="{{ url_for('projects.add_person_form', slug=slug) }}?person_id={{ person.id }}"
+        hx-target="#person-add-form"
+        hx-swap="outerHTML">
+  {{ person.first_name }} {{ person.last_name }}
+  {% if person.function_title %}
+  <span class="dropdown-item-hint">{{ person.function_title }}</span>
+  {% endif %}
+</button>
+{% endfor %}
+{% if not persons %}
+<div class="dropdown-item text-muted">No matching persons found.</div>
+{% endif %}

@@ -438,3 +438,219 @@ def _validate_dates(project, field: str, new_value: str) -> str | None:
             return "Realized start cannot be after realized end."
 
     return None
+
+
+# ── Person relation management ──
+
+
+def _get_project_or_404(slug: str):
+    """Get a project by slug or abort 404."""
+    from flask import abort
+
+    repo = _get_repo()
+    project = repo.get_by_slug(slug)
+    if project is None:
+        abort(404)
+    return project
+
+
+def _render_persons_section(project):
+    """Render the persons section partial."""
+    conn = _get_conn()
+    persons = ProjectPersonRepository(conn).list_for_project(project.id)
+    return render_template(
+        "projects/partials/_persons_section.html",
+        project=project,
+        persons=persons,
+    )
+
+
+def _render_tags_section(project):
+    """Render the tags section partial."""
+    conn = _get_conn()
+    tags = ProjectTagRepository(conn).list_for_project(project.id)
+    return render_template(
+        "projects/partials/_tags_section.html",
+        project=project,
+        tags=tags,
+    )
+
+
+@bp.route("/<slug>/persons/add-form")
+def add_person_form(slug):
+    """Return the inline form for adding a person to a project."""
+    _ = _get_project_or_404(slug)
+
+    selected_person = None
+    person_id = request.args.get("person_id", "").strip()
+    if person_id:
+        conn = _get_conn()
+        selected_person = PersonRepository(conn).get(person_id)
+
+    return render_template(
+        "projects/partials/_person_add_form.html",
+        slug=slug,
+        selected_person=selected_person,
+    )
+
+
+@bp.route("/<slug>/persons/search")
+def search_person_for_detail(slug):
+    """HTMX endpoint: person search dropdown for project detail add-person form."""
+    q = request.args.get("q", "").strip().lower()
+    conn = _get_conn()
+    all_persons = PersonRepository(conn).list(current_only=True)
+
+    if q:
+        persons = [
+            p
+            for p in all_persons
+            if q in p.first_name.lower()
+            or q in p.last_name.lower()
+            or q in f"{p.first_name} {p.last_name}".lower()
+        ]
+    else:
+        persons = all_persons
+
+    return render_template(
+        "projects/partials/_person_dropdown_detail.html",
+        persons=persons,
+        slug=slug,
+    )
+
+
+@bp.route("/<slug>/persons/add", methods=["POST"])
+def add_person(slug):
+    """Add a person to a project with a role."""
+    project = _get_project_or_404(slug)
+
+    person_id = request.form.get("person_id", "").strip()
+    role = request.form.get("role", "").strip()
+
+    if not person_id or not role:
+        return render_template(
+            "projects/partials/_person_add_form.html",
+            slug=slug,
+            error="Person and role are required.",
+        )
+
+    conn = _get_conn()
+    ProjectPersonRepository(conn).add(
+        project_id=project.id,
+        person_id=person_id,
+        role=role,
+    )
+    return _render_persons_section(project)
+
+
+@bp.route("/<slug>/persons/remove", methods=["POST"])
+def remove_person(slug):
+    """Remove a person-role link from a project."""
+    project = _get_project_or_404(slug)
+
+    person_id = request.form.get("person_id", "").strip()
+    role = request.form.get("role", "").strip()
+
+    if person_id and role:
+        conn = _get_conn()
+        ProjectPersonRepository(conn).remove(
+            project_id=project.id,
+            person_id=person_id,
+            role=role,
+        )
+    return _render_persons_section(project)
+
+
+# ── Tag relation management ──
+
+
+@bp.route("/<slug>/tags/add-form")
+def add_tag_form(slug):
+    """Return the inline form for adding a tag to a project."""
+    _ = _get_project_or_404(slug)
+
+    selected_tag = None
+    tag_id = request.args.get("tag_id", "").strip()
+    if tag_id:
+        conn = _get_conn()
+        selected_tag = TagRepository(conn).get(tag_id)
+
+    return render_template(
+        "projects/partials/_tag_add_form.html",
+        slug=slug,
+        selected_tag=selected_tag,
+    )
+
+
+@bp.route("/<slug>/tags/search")
+def search_tag_for_detail(slug):
+    """HTMX endpoint: tag search dropdown for project detail add-tag form."""
+    q = request.args.get("q", "").strip().lower()
+    conn = _get_conn()
+    all_tags = TagRepository(conn).list()
+
+    if q:
+        tags = [t for t in all_tags if q in t.name.lower()]
+    else:
+        tags = all_tags
+
+    return render_template(
+        "projects/partials/_tag_dropdown_detail.html",
+        tags=tags,
+        query=q,
+        slug=slug,
+    )
+
+
+@bp.route("/<slug>/tags/create-and-select", methods=["POST"])
+def create_and_select_tag(slug):
+    """Create a new tag and return the add-tag form with it selected."""
+    _ = _get_project_or_404(slug)
+
+    name = request.form.get("name", "").strip()
+    if not name:
+        return render_template(
+            "projects/partials/_tag_add_form.html",
+            slug=slug,
+            error="Tag name is required.",
+        )
+
+    conn = _get_conn()
+    tag = TagRepository(conn).create(name=name)
+    return render_template(
+        "projects/partials/_tag_add_form.html",
+        slug=slug,
+        selected_tag=tag,
+    )
+
+
+@bp.route("/<slug>/tags/add", methods=["POST"])
+def add_tag(slug):
+    """Add a tag to a project."""
+    project = _get_project_or_404(slug)
+
+    tag_id = request.form.get("tag_id", "").strip()
+
+    if not tag_id:
+        return render_template(
+            "projects/partials/_tag_add_form.html",
+            slug=slug,
+            error="Please select a tag.",
+        )
+
+    conn = _get_conn()
+    ProjectTagRepository(conn).add(project_id=project.id, tag_id=tag_id)
+    return _render_tags_section(project)
+
+
+@bp.route("/<slug>/tags/remove", methods=["POST"])
+def remove_tag(slug):
+    """Remove a tag from a project."""
+    project = _get_project_or_404(slug)
+
+    tag_id = request.form.get("tag_id", "").strip()
+
+    if tag_id:
+        conn = _get_conn()
+        ProjectTagRepository(conn).remove(project_id=project.id, tag_id=tag_id)
+    return _render_tags_section(project)

@@ -1,0 +1,47 @@
+{# Inline form to add a tag to a project. #}
+<div class="inline-add-form" id="tag-add-form">
+  {% if error %}
+  <p class="inline-edit-error">{{ error }}</p>
+  {% endif %}
+
+  <div class="form-group">
+    <label>Tag</label>
+    {% if selected_tag %}
+    <div class="selected-value">
+      <span>{{ selected_tag.name }}</span>
+      <button type="button" class="btn-clear"
+              hx-get="{{ url_for('projects.add_tag_form', slug=slug) }}"
+              hx-target="#tag-add-form"
+              hx-swap="outerHTML"
+              title="Clear">&times;</button>
+    </div>
+    {% else %}
+    <input type="search" placeholder="Search tags..."
+           hx-get="{{ url_for('projects.search_tag_for_detail', slug=slug) }}"
+           hx-trigger="keyup changed delay:300ms, focus"
+           hx-target="#detail-tag-results"
+           hx-include="this"
+           name="q"
+           autocomplete="off">
+    <div id="detail-tag-results" class="dropdown-results"></div>
+    {% endif %}
+  </div>
+
+  {% if selected_tag %}
+  <form hx-post="{{ url_for('projects.add_tag', slug=slug) }}"
+        hx-target="#project-tags"
+        hx-swap="outerHTML">
+    <input type="hidden" name="tag_id" value="{{ selected_tag.id }}">
+    <div class="inline-edit-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Add tag</button>
+      <button type="button" class="btn btn-secondary btn-sm"
+              onclick="document.getElementById('tag-add-area').innerHTML=''">Cancel</button>
+    </div>
+  </form>
+  {% else %}
+  <div class="inline-edit-actions">
+    <button type="button" class="btn btn-secondary btn-sm"
+            onclick="document.getElementById('tag-add-area').innerHTML=''">Cancel</button>
+  </div>
+  {% endif %}
+</div>

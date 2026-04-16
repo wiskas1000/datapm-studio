@@ -1,0 +1,18 @@
+{# Tag dropdown for project detail — clicking selects the tag. #}
+{% for tag in tags %}
+<button type="button" class="dropdown-item"
+        hx-get="{{ url_for('projects.add_tag_form', slug=slug) }}?tag_id={{ tag.id }}"
+        hx-target="#tag-add-form"
+        hx-swap="outerHTML">
+  {{ tag.name }}
+</button>
+{% endfor %}
+{% if not tags and query %}
+<button type="button" class="dropdown-item dropdown-item-action"
+        hx-post="{{ url_for('projects.create_and_select_tag', slug=slug) }}"
+        hx-vals='{"name": "{{ query | e }}"}'
+        hx-target="#tag-add-form"
+        hx-swap="outerHTML">
+  + Create "{{ query }}"
+</button>
+{% endif %}

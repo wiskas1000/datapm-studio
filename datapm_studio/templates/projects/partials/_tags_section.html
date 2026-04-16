@@ -1,0 +1,30 @@
+{# Tags section for project detail — shows linked tags with add/remove. #}
+<div id="project-tags" class="card">
+  <div class="card-header-row">
+    <h2>Tags</h2>
+    <button class="btn btn-secondary btn-sm"
+            hx-get="{{ url_for('projects.add_tag_form', slug=project.slug) }}"
+            hx-target="#tag-add-area"
+            hx-swap="innerHTML">+ Add</button>
+  </div>
+
+  {% if tags %}
+  <div class="tag-chips">
+    {% for tag in tags %}
+    <span class="tag-chip">
+      {{ tag.name }}
+      <button class="btn-remove"
+              hx-post="{{ url_for('projects.remove_tag', slug=project.slug) }}"
+              hx-vals='{"tag_id": "{{ tag.id }}"}'
+              hx-target="#project-tags"
+              hx-swap="outerHTML"
+              title="Remove tag">&times;</button>
+    </span>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted">No tags yet.</p>
+  {% endif %}
+
+  <div id="tag-add-area"></div>
+</div>
