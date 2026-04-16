@@ -187,10 +187,10 @@
 
 ### Acceptance Criteria
 
-- [ ] `/search?q=...` returns results using FTS5
-- [ ] Results show project title, slug, status, domain, requestor name, entity types, aggregation levels
-- [ ] Results link to project detail pages
-- [ ] UI polish: loading indicators on HTMX requests, consistent error messages, flash messages
+- [x] `/search?q=...` returns results using FTS5
+- [x] Results show project title, slug, status, domain, requestor name, entity types, aggregation levels
+- [x] Results link to project detail pages
+- [x] UI polish: loading indicators on HTMX requests, consistent error messages, flash messages
 
 ### PR Breakdown
 
