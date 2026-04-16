@@ -14,6 +14,7 @@ from data_project_manager.db.repositories.data_file import (
     DataFileRepository,
 )
 from data_project_manager.db.repositories.person import ProjectPersonRepository
+from data_project_manager.db.repositories.project import ProjectRepository
 
 bp = Blueprint("search", __name__, url_prefix="/search")
 
@@ -73,9 +74,24 @@ def search():
     Query param: q (search string)
     """
     q = request.args.get("q", "").strip()
-    enriched: list[EnrichedResult] = []
     if q:
         db_path = current_app.config.get("DATAPM_DB_PATH")
         results = search_projects(q, db_path=db_path)
-        enriched = _enrich(results)
+    else:
+        conn = current_app.get_db()  # type: ignore[attr-defined]
+        projects = ProjectRepository(conn).list()
+        results = [
+            SearchResult(
+                id=p.id,
+                slug=p.slug,
+                title=p.title,
+                description=p.description,
+                status=p.status,
+                domain=p.domain,
+                rank=0.0,
+                created_at=p.created_at,
+            )
+            for p in projects
+        ]
+    enriched = _enrich(results)
     return render_template("search/results.html", results=enriched, query=q)

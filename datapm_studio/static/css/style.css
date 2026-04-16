@@ -577,6 +577,12 @@ li {
     font-family: var(--font-mono);
 }
 
+.search-results-heading {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
 .selected-value {
     display: flex;
     align-items: center;
