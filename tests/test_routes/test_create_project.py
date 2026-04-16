@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from werkzeug.datastructures import MultiDict
 
+from data_project_manager.db.repositories.data_file import (
+    AggregationLevelRepository,
+    EntityTypeRepository,
+)
 from data_project_manager.db.repositories.person import (
     PersonRepository,
     ProjectPersonRepository,
@@ -12,6 +16,7 @@ from data_project_manager.db.repositories.project import (
     ProjectRepository,
     ProjectRootRepository,
 )
+from data_project_manager.db.repositories.question import RequestQuestionRepository
 from data_project_manager.db.repositories.tag import ProjectTagRepository, TagRepository
 
 
@@ -417,3 +422,114 @@ def test_create_with_external_url(client, db_conn, tmp_path):
     proj_repo = ProjectRepository(db_conn)
     project = proj_repo.list()[0]
     assert project.external_url == "https://dev.azure.com/org/project"
+
+
+def test_create_form_shows_research_context(client):
+    """The form exposes the research context fields."""
+    r = client.get("/projects/new")
+    assert r.status_code == 200
+    assert b'name="questions_text"' in r.data
+    assert b'name="entity_types_text"' in r.data
+    assert b'name="agg_levels_text"' in r.data
+
+
+def test_create_project_creates_initial_questions(client, db_conn, tmp_path):
+    """Each non-empty line in questions_text becomes a RequestQuestion."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "With Questions",
+            "root_name": "test-root",
+            "questions_text": (
+                "What is the churn rate for Q1?\n"
+                "\n"
+                "Which segments drive retention?\n"
+                "   \n"
+            ),
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+    project = ProjectRepository(db_conn).list()[0]
+    questions = RequestQuestionRepository(db_conn).list_for_project(project.id)
+    assert len(questions) == 2
+    texts = {q.question_text for q in questions}
+    assert texts == {
+        "What is the churn rate for Q1?",
+        "Which segments drive retention?",
+    }
+
+
+def test_create_project_seeds_entity_types(client, db_conn, tmp_path):
+    """Comma-separated entity types are added to the vocabulary."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "With Entity Types",
+            "root_name": "test-root",
+            "entity_types_text": "patient, visit ,  claim",
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+    names = {e.name for e in EntityTypeRepository(db_conn).list()}
+    assert {"patient", "visit", "claim"}.issubset(names)
+
+
+def test_create_project_seeds_agg_levels(client, db_conn, tmp_path):
+    """Comma-separated aggregation levels are added to the vocabulary."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "With Agg Levels",
+            "root_name": "test-root",
+            "agg_levels_text": "biweekly, quarterly",
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+    names = {a.name for a in AggregationLevelRepository(db_conn).list()}
+    assert {"biweekly", "quarterly"}.issubset(names)
+
+
+def test_create_project_empty_metadata_is_noop(client, db_conn, tmp_path):
+    """Empty metadata fields don't create spurious records."""
+    root_repo = ProjectRootRepository(db_conn)
+    root_repo.create(
+        name="test-root", absolute_path=str(tmp_path / "projects"), is_default=True
+    )
+
+    r = client.post(
+        "/projects/new",
+        data={
+            "title": "No Metadata",
+            "root_name": "test-root",
+            "questions_text": "   \n\n",
+            "entity_types_text": "  ",
+            "agg_levels_text": " , , ",
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 302
+
+    project = ProjectRepository(db_conn).list()[0]
+    questions = RequestQuestionRepository(db_conn).list_for_project(project.id)
+    assert questions == []

@@ -155,6 +155,36 @@
   </div>
 
   <div class="card">
+    <h2>Research Context</h2>
+    <p class="form-hint">Optional metadata captured upfront. Data files and their lookups can be registered from the project page after creation.</p>
+
+    <div class="form-group">
+      <label for="questions_text">Request questions</label>
+      <textarea id="questions_text" name="questions_text" rows="4"
+                placeholder="One question per line, e.g.&#10;What is the churn rate for Q1?&#10;Which segments drive retention?">{{ form.questions_text or '' }}</textarea>
+      <p class="form-hint">One question per line. Saved as separate request questions.</p>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="entity_types_text">Entity types</label>
+        <input type="text" id="entity_types_text" name="entity_types_text"
+               value="{{ form.entity_types_text or '' }}"
+               placeholder="e.g. patient, visit, claim">
+        <p class="form-hint">Comma-separated. Added to the entity-type vocabulary for later attachment to data files.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="agg_levels_text">Aggregation levels</label>
+        <input type="text" id="agg_levels_text" name="agg_levels_text"
+               value="{{ form.agg_levels_text or '' }}"
+               placeholder="e.g. daily, weekly, monthly">
+        <p class="form-hint">Comma-separated. Added to the aggregation-level vocabulary.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>Dates &amp; Planning</h2>
 
     <div class="form-row">
