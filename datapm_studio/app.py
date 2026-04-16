@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from flask import Flask
@@ -18,6 +19,9 @@ def create_app(*, db_path: str | Path | None = None) -> Flask:
             temporary SQLite file instead of the user's real database.
     """
     app = Flask(__name__)
+    # Hardcoded key is acceptable: Studio is local single-user, no auth, and
+    # sessions are used only for flash messages. Do not reuse this app in a
+    # multi-user or networked deployment without replacing the key.
     app.secret_key = "datapm-studio-local-only"
 
     # Load datapm config
@@ -71,4 +75,7 @@ def create_app(*, db_path: str | Path | None = None) -> Flask:
 def main() -> None:
     """Entry point for `datapm-studio` CLI command."""
     app = create_app()
-    app.run(port=5555, debug=True)
+    # Debug (including the Werkzeug interactive debugger) is off by default.
+    # Opt in with DATAPM_STUDIO_DEBUG=1 for local development only.
+    debug = os.environ.get("DATAPM_STUDIO_DEBUG", "").lower() in {"1", "true", "yes"}
+    app.run(port=5555, debug=debug)
