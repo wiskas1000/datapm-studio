@@ -21,33 +21,46 @@
   {% if not query %}
   <p class="search-results-heading">All projects ({{ results|length }})</p>
   {% endif %}
-  <ul class="search-results">
-    {% for item in results %}
-    <li class="search-result">
-      <div class="search-result-header">
-        <a href="{{ url_for('projects.detail', slug=item.result.slug) }}" class="search-result-title">
-          {{ item.result.title }}
-        </a>
-        <span class="badge badge-{{ item.result.status }}">{{ item.result.status }}</span>
-      </div>
-      <div class="search-result-meta">
-        <span class="search-result-slug">{{ item.result.slug }}</span>
-        {% if item.result.domain %}<span>· {{ item.result.domain }}</span>{% endif %}
-        {% if item.requestor %}<span>· {{ item.requestor }}</span>{% endif %}
-      </div>
-      {% if item.entity_types or item.aggregation_levels %}
-      <div class="tag-chips">
-        {% for name in item.entity_types %}
-        <span class="tag-chip">{{ name }}</span>
-        {% endfor %}
-        {% for name in item.aggregation_levels %}
-        <span class="tag-chip">{{ name }}</span>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </li>
-    {% endfor %}
-  </ul>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Folder</th>
+        <th>Status</th>
+        <th>Domain</th>
+        <th>Requestor</th>
+        <th>Entity types</th>
+        <th>Aggregation levels</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in results %}
+      <tr>
+        <td><a href="{{ url_for('projects.detail', slug=item.result.slug) }}">{{ item.result.title }}</a></td>
+        <td><code>{{ item.result.slug }}</code></td>
+        <td><span class="badge badge-{{ item.result.status }}">{{ item.result.status }}</span></td>
+        <td>{{ item.result.domain or "" }}</td>
+        <td>{{ item.requestor or "" }}</td>
+        <td>
+          {% if item.entity_types %}
+          <div class="tag-chips">
+            {% for name in item.entity_types %}<span class="tag-chip">{{ name }}</span>{% endfor %}
+          </div>
+          {% endif %}
+        </td>
+        <td>
+          {% if item.aggregation_levels %}
+          <div class="tag-chips">
+            {% for name in item.aggregation_levels %}<span class="tag-chip">{{ name }}</span>{% endfor %}
+          </div>
+          {% endif %}
+        </td>
+        <td>{{ item.result.created_at[:10] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% elif query %}
 <div class="card card-empty">
