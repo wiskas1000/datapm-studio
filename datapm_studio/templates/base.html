@@ -20,7 +20,9 @@
     <!-- Theme: prevent flash of wrong theme -->
     <script>
         (function() {
+            var valid = ['dark', 'light', 'mocha', 'latte'];
             var theme = localStorage.getItem('datapm-theme') || 'dark';
+            if (valid.indexOf(theme) === -1) theme = 'dark';
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
@@ -57,12 +59,30 @@
     </footer>
 
     <script>
-        function toggleTheme() {
-            var current = document.documentElement.getAttribute('data-theme') || 'dark';
-            var next = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('datapm-theme', next);
-        }
+        (function() {
+            var cycle = ['dark', 'mocha', 'light', 'latte'];
+            var labels = {
+                dark: 'Theme: dark (click for Catppuccin Mocha)',
+                mocha: 'Theme: Catppuccin Mocha (click for light)',
+                light: 'Theme: light (click for Catppuccin Latte)',
+                latte: 'Theme: Catppuccin Latte (click for dark)'
+            };
+            function updateTooltip() {
+                var btn = document.querySelector('.theme-toggle');
+                if (!btn) return;
+                var t = document.documentElement.getAttribute('data-theme') || 'dark';
+                btn.title = labels[t] || 'Toggle theme';
+            }
+            window.toggleTheme = function() {
+                var current = document.documentElement.getAttribute('data-theme') || 'dark';
+                var idx = cycle.indexOf(current);
+                var next = cycle[(idx + 1) % cycle.length];
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('datapm-theme', next);
+                updateTooltip();
+            };
+            document.addEventListener('DOMContentLoaded', updateTooltip);
+        })();
     </script>
 </body>
 </html>
