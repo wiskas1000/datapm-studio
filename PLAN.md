@@ -152,14 +152,43 @@
 
 ---
 
-## Milestone 4: Search + Polish (v0.4.0)
+## Milestone 3.5: Data Files, Lookups & Request Questions (v0.4.0)
 
-**Goal**: Full-text search across projects. UI polish and usability improvements based on real usage.
+**Goal**: Surface and manage the metadata that makes search useful — data files (with entity types and aggregation levels), request questions, and deliverables. All managed from the project detail page, creation wizard, and close-out checklist.
+
+### Acceptance Criteria
+
+- [x] **Request Questions** — project detail page shows list of request questions; inline form to add new (question_text, data_period_from, data_period_to)
+- [x] **Data Files — read + create** — project detail page shows registered data files (file_path, file_format, sensitivity, is_source, data period); form to register a new file
+- [x] **Data Files — edit** — inline edit for data file scalar fields (sensitivity, file_format, data period, retention_date)
+- [x] **Entity Types per file** — searchable dropdown on each data file to add/remove entity types (autocomplete from lookup table, create-on-type like tags)
+- [x] **Aggregation Levels per file** — searchable dropdown on each data file to add/remove aggregation levels (autocomplete from lookup table, create-on-type like tags)
+- [x] **Deliverables — read + create** — project detail page shows deliverables (type, file_path, version, delivered_at); form to register a new deliverable; "Mark delivered" button
+- [x] **Creation wizard** — add entity types, aggregation levels, and request questions to the project creation form
+- [x] **Close-out updates** — update gap checks to account for new metadata; inline fix where appropriate
+- [x] All new code has tests; tests pass
+
+### PR Breakdown
+
+| # | Branch | Size | Description |
+|---|--------|------|-------------|
+| 20 | `feat/request-questions` | S | Request questions section on project detail: list + add form — shipped in #65 |
+| 21 | `feat/data-files-read-create` | M | Data files section on project detail: list + register form — shipped in #66 |
+| 22 | `feat/data-files-edit-lookups` | L | Inline edit for data file fields; entity type and aggregation level dropdowns per file (add/remove) — shipped in #67 |
+| 23 | `feat/deliverables` | M | Deliverables section on project detail: list + register form + mark delivered — shipped in #68 |
+| 24 | `feat/wizard-closeout-metadata` | M | Add entity types, agg levels, request questions to creation wizard; update closeout gap checks — shipped in #69 |
+| 25 | _(folded in)_ | — | Tests shipped with each feature PR (#65–#69); no separate test PR needed |
+
+---
+
+## Milestone 4: Search + Polish (v0.5.0)
+
+**Goal**: Full-text search across projects. UI polish and usability improvements based on real usage. Now powered by the rich metadata from M3.5.
 
 ### Acceptance Criteria
 
 - [ ] `/search?q=...` returns results using FTS5
-- [ ] Results show project title, slug, status, domain, requestor name
+- [ ] Results show project title, slug, status, domain, requestor name, entity types, aggregation levels
 - [ ] Results link to project detail pages
 - [ ] UI polish: loading indicators on HTMX requests, consistent error messages, flash messages
 
@@ -167,9 +196,9 @@
 
 | # | Branch | Size | Description |
 |---|--------|------|-------------|
-| 17 | `feat/search` | M | Search route using core FTS5, results template |
-| 18 | `feat/polish` | M | Loading states, error handling, flash messages |
-| 19 | `test/milestone-4` | S | Tests for search |
+| 26 | `feat/search` | M | Search route using core FTS5, results template |
+| 27 | `feat/polish` | M | Loading states, error handling, flash messages |
+| 28 | `test/milestone-4` | S | Tests for search |
 
 ---
 
