@@ -13,7 +13,7 @@
     {% for p in persons %}
     <dt>{{ p.role | capitalize }}</dt>
     <dd class="inline-edit-row-dd">
-      {{ p.first_name }} {{ p.last_name }}
+      <a href="{{ url_for('persons.detail', person_id=p.id) }}">{{ p.first_name }} {{ p.last_name }}</a>
       {% if p.function_title %}
       <span class="text-muted">— {{ p.function_title }}</span>
       {% endif %}

@@ -1,0 +1,29 @@
+{# Person table partial — used both in full page and for HTMX filter updates. #}
+{% if persons %}
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Function</th>
+        <th>Department</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for person in persons %}
+      <tr>
+        <td><a href="{{ url_for('persons.detail', person_id=person.id) }}">{{ person.first_name }} {{ person.last_name }}</a></td>
+        <td>{{ person.email or '—' }}</td>
+        <td>{{ person.function_title or '—' }}</td>
+        <td>{{ person.department or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card card-empty">
+  <p>No people found.</p>
+</div>
+{% endif %}

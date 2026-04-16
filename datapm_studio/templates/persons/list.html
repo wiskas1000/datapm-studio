@@ -13,34 +13,19 @@
   </div>
 </div>
 
+<div class="card" style="margin-bottom: 1rem;">
+  <input type="search" placeholder="Filter people..."
+         hx-get="{{ url_for('persons.list_persons') }}"
+         hx-trigger="keyup changed delay:300ms"
+         hx-target="#persons-table"
+         hx-include="this"
+         name="q"
+         autocomplete="off">
+</div>
+
 <div id="person-form-area"></div>
 
-{% if persons %}
-<div class="card">
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Function</th>
-        <th>Department</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for person in persons %}
-      <tr>
-        <td>{{ person.first_name }} {{ person.last_name }}</td>
-        <td>{{ person.email or '—' }}</td>
-        <td>{{ person.function_title or '—' }}</td>
-        <td>{{ person.department or '—' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div id="persons-table">
+  {% include "persons/_table.html" %}
 </div>
-{% else %}
-<div class="card card-empty">
-  <p>No people recorded yet.</p>
-</div>
-{% endif %}
 {% endblock %}

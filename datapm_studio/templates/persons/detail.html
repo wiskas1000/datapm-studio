@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ person.first_name }} {{ person.last_name }} — datapm studio{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-row">
+    <h1>{{ person.first_name }} {{ person.last_name }}</h1>
+    <a href="{{ url_for('persons.edit', person_id=person.id) }}"
+       class="btn btn-primary btn-sm">Edit</a>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Details</h2>
+  <dl class="detail-grid">
+    <dt>First name</dt>
+    <dd>{{ person.first_name }}</dd>
+
+    <dt>Last name</dt>
+    <dd>{{ person.last_name }}</dd>
+
+    <dt>Email</dt>
+    <dd>{{ person.email or '—' }}</dd>
+
+    <dt>Function</dt>
+    <dd>{{ person.function_title or '—' }}</dd>
+
+    <dt>Department</dt>
+    <dd>{{ person.department or '—' }}</dd>
+
+    <dt>Valid from</dt>
+    <dd>{{ person.valid_from or '—' }}</dd>
+
+    {% if person.valid_to %}
+    <dt>Valid to</dt>
+    <dd>{{ person.valid_to }}</dd>
+    {% endif %}
+  </dl>
+</div>
+
+{% if history %}
+<div class="card">
+  <h2>Version history</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Field</th>
+        <th>Old value</th>
+        <th>New value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in history | reverse %}
+      <tr>
+        <td>{{ entry.changed_at[:19] | replace("T", " ") }}</td>
+        <td>{{ entry.field_name | replace("_", " ") | capitalize }}</td>
+        <td class="text-muted">{{ entry.old_value or '—' }}</td>
+        <td>{{ entry.new_value or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="form-actions">
+  <a href="{{ url_for('persons.list_persons') }}" class="btn btn-secondary">&larr; Back to people</a>
+</div>
+{% endblock %}
