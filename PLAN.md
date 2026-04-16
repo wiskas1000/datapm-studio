@@ -130,6 +130,28 @@
 
 ---
 
+## Milestone 3.1: Close-out Inline Fixes (v0.3.1)
+
+**Goal**: Let users fix common metadata gaps directly on the close-out checklist page, without navigating back to the project detail page.
+
+### Acceptance Criteria
+
+- [ ] Description gap shows an inline edit form (reuses `_description_edit.html` pattern)
+- [ ] Realized start/end gaps show inline date pickers
+- [ ] Status gap shows an inline select dropdown
+- [ ] Requestor gap shows the person search dropdown (reuses `_person_add_form.html` pattern)
+- [ ] After fixing a gap inline, the checklist re-renders to reflect the change
+- [ ] Gaps without inline fix (deliverables, data files) keep the current "Fix" link to the project page
+
+### PR Breakdown
+
+| # | Branch | Size | Description |
+|---|--------|------|-------------|
+| 18 | `feat/closeout-inline-fields` | S | Inline edit for description, dates, status on closeout page |
+| 19 | `feat/closeout-inline-requestor` | M | Person search dropdown for adding requestor on closeout page |
+
+---
+
 ## Milestone 4: Search + Polish (v0.4.0)
 
 **Goal**: Full-text search across projects. UI polish and usability improvements based on real usage.
