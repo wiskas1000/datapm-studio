@@ -1,0 +1,47 @@
+{# Inline form for registering a deliverable to a project. #}
+<form class="inline-add-form"
+      hx-post="{{ url_for('projects.add_deliverable', slug=slug) }}"
+      hx-target="#project-deliverables"
+      hx-swap="outerHTML">
+  <div class="form-row">
+    <div class="form-group">
+      <label for="type">Type</label>
+      <input type="text" id="type" name="type"
+             placeholder="report, dashboard, dataset…"
+             value="{{ type | default('', true) }}" required>
+    </div>
+    <div class="form-group">
+      <label for="version">Version</label>
+      <input type="text" id="version" name="version"
+             placeholder="v1.0"
+             value="{{ version | default('', true) }}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="file_path">File path</label>
+    <input type="text" id="file_path" name="file_path"
+           placeholder="output/report_Q1.pdf"
+           value="{{ file_path | default('', true) }}">
+  </div>
+  <div class="form-group">
+    <label for="file_format">Format</label>
+    <input type="text" id="file_format" name="file_format"
+           placeholder="pdf, xlsx, pbix…"
+           value="{{ file_format | default('', true) }}">
+  </div>
+  <div class="form-group">
+    <label>
+      <input type="checkbox" name="mark_delivered" value="1"
+             {{ 'checked' if mark_delivered else '' }}>
+      Mark as delivered now
+    </label>
+  </div>
+  {% if error %}
+  <p class="form-error">{{ error }}</p>
+  {% endif %}
+  <div class="form-actions-inline">
+    <button type="submit" class="btn btn-primary btn-sm">Register deliverable</button>
+    <button type="button" class="btn btn-secondary btn-sm"
+            onclick="this.closest('#deliverable-add-area').innerHTML = ''">Cancel</button>
+  </div>
+</form>
