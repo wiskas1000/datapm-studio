@@ -508,6 +508,8 @@ def search_person_for_detail(slug):
             if q in p.first_name.lower()
             or q in p.last_name.lower()
             or q in f"{p.first_name} {p.last_name}".lower()
+            or (p.function_title is not None and q in p.function_title.lower())
+            or (p.department is not None and q in p.department.lower())
         ]
     else:
         persons = all_persons

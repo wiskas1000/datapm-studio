@@ -29,6 +29,17 @@ def _get_repo_with_changelog() -> PersonRepository:
     return PersonRepository(conn, changelog=changelog)
 
 
+def _person_matches(p, q: str) -> bool:
+    """Check if a person matches a search query (name, function, department)."""
+    return (
+        q in p.first_name.lower()
+        or q in p.last_name.lower()
+        or q in f"{p.first_name} {p.last_name}".lower()
+        or (p.function_title is not None and q in p.function_title.lower())
+        or (p.department is not None and q in p.department.lower())
+    )
+
+
 @bp.route("/")
 def list_persons():
     """List all current persons, with optional search filter."""
@@ -37,13 +48,7 @@ def list_persons():
 
     q = request.args.get("q", "").strip().lower()
     if q:
-        persons = [
-            p
-            for p in all_persons
-            if q in p.first_name.lower()
-            or q in p.last_name.lower()
-            or q in f"{p.first_name} {p.last_name}".lower()
-        ]
+        persons = [p for p in all_persons if _person_matches(p, q)]
     else:
         persons = all_persons
 
@@ -66,13 +71,7 @@ def search_persons():
     all_persons = repo.list(current_only=True)
 
     if q:
-        persons = [
-            p
-            for p in all_persons
-            if q in p.first_name.lower()
-            or q in p.last_name.lower()
-            or q in f"{p.first_name} {p.last_name}".lower()
-        ]
+        persons = [p for p in all_persons if _person_matches(p, q)]
     else:
         persons = all_persons
 
