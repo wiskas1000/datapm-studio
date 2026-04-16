@@ -1,5 +1,45 @@
 /* datapm-studio — minimal JS, HTMX handles most interactivity */
 
+/* ── Flash messages ── */
+function flashMessage(category, text) {
+    var container = document.getElementById('flash-container');
+    if (!container) return;
+    var div = document.createElement('div');
+    div.className = 'flash flash-' + category;
+    div.textContent = text;
+    container.appendChild(div);
+    setTimeout(function() { autoDismissFlash(div); }, 5000);
+}
+
+function autoDismissFlash(el) {
+    if (!el || !el.parentNode) return;
+    el.classList.add('flash-dismiss');
+    setTimeout(function() {
+        if (el.parentNode) el.parentNode.removeChild(el);
+    }, 400);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var existing = document.querySelectorAll('#flash-container .flash');
+    existing.forEach(function(el) {
+        setTimeout(function() { autoDismissFlash(el); }, 5000);
+    });
+});
+
+/* ── HTMX error handling: surface failures as flash messages ── */
+document.addEventListener('htmx:responseError', function(evt) {
+    var status = evt.detail && evt.detail.xhr ? evt.detail.xhr.status : 0;
+    flashMessage('error', 'Request failed (' + status + '). Please try again.');
+});
+
+document.addEventListener('htmx:sendError', function() {
+    flashMessage('error', 'Network error. Check your connection and try again.');
+});
+
+document.addEventListener('htmx:timeout', function() {
+    flashMessage('error', 'Request timed out. Please try again.');
+});
+
 /* ── Person dropdown selection ── */
 function selectPerson(el) {
     var personId = el.getAttribute('data-person-id');
