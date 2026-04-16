@@ -1,0 +1,46 @@
+{# Generic edit-mode partial for a single project field.
+   Variables: slug, field, label, value, field_type, options (for select), error #}
+<div id="field-{{ field }}" class="inline-edit-row">
+  <dt>{{ label }}</dt>
+  <dd>
+    <form class="inline-edit-form"
+          hx-post="{{ url_for('projects.edit_field', slug=slug, field=field) }}"
+          hx-target="#field-{{ field }}"
+          hx-swap="outerHTML">
+      {% if error %}
+      <p class="inline-edit-error">{{ error }}</p>
+      {% endif %}
+
+      {% if field_type == "select" %}
+      <select name="value" autofocus>
+        {% for opt in options %}
+        <option value="{{ opt }}" {{ "selected" if opt == value }}>{{ opt }}</option>
+        {% endfor %}
+      </select>
+
+      {% elif field_type == "textarea" %}
+      <textarea name="value" rows="3" autofocus>{{ value or "" }}</textarea>
+
+      {% elif field_type == "date" %}
+      <input type="date" name="value" value="{{ value or '' }}" autofocus>
+
+      {% elif field_type == "number" %}
+      <input type="number" name="value" value="{{ value or '' }}" step="0.5" min="0" autofocus>
+
+      {% elif field_type == "url" %}
+      <input type="url" name="value" value="{{ value or '' }}" placeholder="https://..." autofocus>
+
+      {% else %}
+      <input type="text" name="value" value="{{ value or '' }}" autofocus>
+      {% endif %}
+
+      <div class="inline-edit-actions">
+        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        <button type="button" class="btn btn-secondary btn-sm"
+                hx-get="{{ url_for('projects.read_field', slug=slug, field=field) }}"
+                hx-target="#field-{{ field }}"
+                hx-swap="outerHTML">Cancel</button>
+      </div>
+    </form>
+  </dd>
+</div>

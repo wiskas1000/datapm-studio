@@ -1,0 +1,19 @@
+{# Edit-mode partial for the description card. #}
+<div id="field-description">
+  <h2>Description</h2>
+  {% if error %}
+  <p class="inline-edit-error">{{ error }}</p>
+  {% endif %}
+  <form hx-post="{{ url_for('projects.edit_field', slug=slug, field='description') }}"
+        hx-target="#field-description"
+        hx-swap="outerHTML">
+    <textarea name="value" rows="4" autofocus>{{ value or "" }}</textarea>
+    <div class="inline-edit-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm"
+              hx-get="{{ url_for('projects.read_field', slug=slug, field='description') }}"
+              hx-target="#field-description"
+              hx-swap="outerHTML">Cancel</button>
+    </div>
+  </form>
+</div>

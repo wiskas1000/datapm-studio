@@ -1,0 +1,21 @@
+{# Edit-mode partial for the status badge. #}
+<div id="field-status" class="inline-edit-status">
+  {% if error %}
+  <p class="inline-edit-error">{{ error }}</p>
+  {% endif %}
+  <form class="inline-edit-form-inline"
+        hx-post="{{ url_for('projects.edit_field', slug=slug, field='status') }}"
+        hx-target="#field-status"
+        hx-swap="outerHTML">
+    <select name="value" autofocus>
+      {% for opt in options %}
+      <option value="{{ opt }}" {{ "selected" if opt == value }}>{{ opt }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+    <button type="button" class="btn btn-secondary btn-sm"
+            hx-get="{{ url_for('projects.read_field', slug=slug, field='status') }}"
+            hx-target="#field-status"
+            hx-swap="outerHTML">Cancel</button>
+  </form>
+</div>

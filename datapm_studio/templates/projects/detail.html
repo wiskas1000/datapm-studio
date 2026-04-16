@@ -9,16 +9,13 @@
       <h1>{{ project.title }}</h1>
       <p class="subtitle"><code>{{ project.slug }}</code></p>
     </div>
-    <span class="badge badge-{{ project.status }}">{{ project.status }}</span>
+    {% include "projects/partials/_status_read.html" %}
   </div>
 </div>
 
-{% if project.description %}
 <div class="card">
-  <h2>Description</h2>
-  <p>{{ project.description }}</p>
+  {% include "projects/partials/_description_read.html" %}
 </div>
-{% endif %}
 
 <div class="card">
   <h2>Details</h2>
@@ -26,10 +23,9 @@
     <dt>Type</dt>
     <dd>{{ "Ad-hoc" if project.is_adhoc else "Planned" }}</dd>
 
-    {% if project.domain %}
-    <dt>Domain</dt>
-    <dd>{{ project.domain }}</dd>
-    {% endif %}
+    {% with field="domain", label="Domain", value=project.domain %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
 
     {% if project.template_used %}
     <dt>Template</dt>
@@ -46,10 +42,9 @@
     <dd><code>{{ project.relative_path }}</code></dd>
     {% endif %}
 
-    {% if project.external_url %}
-    <dt>External URL</dt>
-    <dd><a href="{{ project.external_url }}">{{ project.external_url }}</a></dd>
-    {% endif %}
+    {% with field="external_url", label="External URL", value=project.external_url %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
 
     <dt>Git repo</dt>
     <dd>{{ "Yes" if project.has_git_repo else "No" }}</dd>
@@ -87,35 +82,29 @@
 <div class="card">
   <h2>Dates</h2>
   <dl class="detail-grid">
-    {% if project.request_date %}
-    <dt>Request date</dt>
-    <dd>{{ project.request_date }}</dd>
-    {% endif %}
+    {% with field="request_date", label="Request date", value=project.request_date %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
 
-    {% if project.expected_start %}
-    <dt>Expected start</dt>
-    <dd>{{ project.expected_start }}</dd>
-    {% endif %}
+    {% with field="expected_start", label="Expected start", value=project.expected_start %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
 
-    {% if project.expected_end %}
-    <dt>Expected end</dt>
-    <dd>{{ project.expected_end }}</dd>
-    {% endif %}
+    {% with field="expected_end", label="Expected end", value=project.expected_end %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
 
-    {% if project.realized_start %}
-    <dt>Realized start</dt>
-    <dd>{{ project.realized_start }}</dd>
-    {% endif %}
+    {% with field="realized_start", label="Realized start", value=project.realized_start %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
 
-    {% if project.realized_end %}
-    <dt>Realized end</dt>
-    <dd>{{ project.realized_end }}</dd>
-    {% endif %}
+    {% with field="realized_end", label="Realized end", value=project.realized_end %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
 
-    {% if project.estimated_hours is not none %}
-    <dt>Estimated hours</dt>
-    <dd>{{ project.estimated_hours }}</dd>
-    {% endif %}
+    {% with field="estimated_hours", label="Estimated hours", value=project.estimated_hours %}
+    {% include "projects/partials/_field_read.html" %}
+    {% endwith %}
   </dl>
 </div>
 

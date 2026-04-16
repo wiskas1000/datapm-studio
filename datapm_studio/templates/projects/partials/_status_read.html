@@ -1,0 +1,8 @@
+{# Read-mode partial for the status badge in the page header. #}
+<div id="field-status" class="inline-edit-status">
+  <span class="badge badge-{{ project.status }}">{{ project.status }}</span>
+  <button class="btn-inline-edit"
+          hx-get="{{ url_for('projects.edit_field', slug=project.slug, field='status') }}"
+          hx-target="#field-status"
+          hx-swap="outerHTML">Edit</button>
+</div>

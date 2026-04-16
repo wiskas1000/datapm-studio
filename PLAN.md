@@ -44,15 +44,15 @@
 
 ### Acceptance Criteria
 
-- [ ] `/projects/new` shows a form with: title, type (ad-hoc/planned), domain, requestor (searchable dropdown), tags (multi-select), template, root, dates
+- [x] `/projects/new` shows a form with: title, type (ad-hoc/planned), domain, requestor (searchable dropdown), tags (multi-select), template, root, dates
 - [x] Requestor dropdown searches existing persons (HTMX, 300ms debounce)
 - [x] Requestor dropdown shows "add new person" when no match
 - [x] "Add new person" opens an inline form (HTMX partial) — no page reload
 - [x] Tags dropdown auto-completes from existing tags
-- [ ] On submit: project record created in DB, folder scaffolded on disk, requestor linked as ProjectPerson
-- [ ] Redirect to `/projects/<slug>` after creation
-- [ ] Validation: empty title shows error, slug collision shows error
-- [ ] Project detail page shows all metadata (read-only for now)
+- [x] On submit: project record created in DB, folder scaffolded on disk, requestor linked as ProjectPerson
+- [x] Redirect to `/projects/<slug>` after creation
+- [x] Validation: empty title shows error, slug collision shows error
+- [x] Project detail page shows all metadata (read-only for now)
 
 ### PR Breakdown
 
@@ -73,19 +73,27 @@
 
 ### Acceptance Criteria
 
-- [ ] Project detail page has inline edit buttons for: status, domain, tags, external_url, dates
-- [ ] Clicking "Edit" on a field swaps it to an edit form (HTMX); saving swaps back to read mode
-- [ ] `/persons` shows a list of current persons with search/filter
-- [ ] Editing a person triggers SCD2 versioning via PersonRepository
-- [ ] Quick "add new person" form on the persons page
+- [ ] Project detail page has inline "Edit" buttons for scalar fields: status, domain, description, dates, estimated hours, external_url
+- [ ] Clicking "Edit" on a field swaps it to an inline edit form (HTMX `hx-get`); saving swaps back to read mode (HTMX `hx-post`)
+- [ ] Status field uses a `<select>` dropdown with valid values: active, paused, done, archived
+- [ ] Project detail page allows adding/removing persons (with role) and tags
+- [ ] Adding a person reuses the existing HTMX search dropdown from the create form
+- [ ] Adding a tag reuses the existing HTMX search dropdown from the create form
+- [ ] Removing a person or tag uses `ProjectPersonRepository.remove()` / `ProjectTagRepository.remove()`
+- [ ] `/persons` shows a searchable list of current persons with name, email, function, department
+- [ ] `/persons/<id>` shows person detail with edit form for all fields
+- [ ] Editing a person creates a new SCD2 version via `PersonRepository.create_new_version()`
+- [ ] Version history shown on person detail page via `ChangeLogRepository`
+- [ ] Quick "add new person" form on the persons list page
 
 ### PR Breakdown
 
 | # | Branch | Size | Description |
 |---|--------|------|-------------|
-| 10 | `feat/inline-edit` | M | Generic inline edit pattern for project fields |
-| 11 | `feat/person-management` | M | Person list, edit (SCD2), add new |
-| 12 | `test/milestone-2` | M | Tests for inline editing and person management |
+| 10 | `feat/project-inline-edit` | M | Inline edit partials for project scalar fields (status, domain, description, dates, hours, external_url) |
+| 11 | `feat/project-edit-relations` | M | Add/remove persons and tags on existing project detail page |
+| 12 | `feat/person-management` | M | Person list search, person detail page, SCD2 edit form, version history |
+| 13 | `test/milestone-2` | M | Tests for inline editing, relation management, and person management |
 
 ---
 
