@@ -12,6 +12,7 @@
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -41,14 +42,12 @@
         </div>
     </nav>
 
+    <div id="htmx-progress" aria-hidden="true"></div>
+
     <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="flash flash-{{ category }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+        <div id="flash-container">
+            {% include "partials/_flash.html" %}
+        </div>
 
         {% block content %}{% endblock %}
     </main>
