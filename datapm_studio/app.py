@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 from flask import Flask
@@ -71,7 +72,15 @@ def create_app(*, db_path: str | Path | None = None) -> Flask:
     return app
 
 
-def main() -> None:
+def _build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="datapm-studio")
+    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument("--port", type=int, default=5555)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> None:
     """Entry point for `datapm-studio` CLI command."""
+    args = _build_arg_parser().parse_args(argv)
     app = create_app()
-    app.run(port=5555, debug=False)
+    app.run(host=args.host, port=args.port, debug=False)
