@@ -651,20 +651,22 @@ body.htmx-request #htmx-progress,
 }
 
 .btn-icon {
-    background: none;
+    background: transparent;
     border: none;
-    padding: 0.15rem;
+    padding: 0.1rem;
     margin: 0;
     cursor: pointer;
     color: var(--text-muted);
+    opacity: 0.55;
     display: inline-flex;
     align-items: center;
     border-radius: 3px;
 }
 
 .btn-icon:hover {
+    opacity: 1;
     color: var(--text);
-    background: var(--bg-hover, rgba(128, 128, 128, 0.15));
+    background: transparent;
 }
 
 .search-filters {
