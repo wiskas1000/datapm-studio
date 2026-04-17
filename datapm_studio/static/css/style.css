@@ -625,6 +625,25 @@ body.htmx-request #htmx-progress,
     font-size: 0.85rem;
 }
 
+.projects-list-toggle {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.projects-list-toggle label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+}
+
+.projects-list-more {
+    margin: 0.75rem 0 0 0;
+    text-align: right;
+    font-size: 0.9rem;
+}
+
 .search-filters {
     margin-top: 1rem;
     font-size: 0.9rem;
