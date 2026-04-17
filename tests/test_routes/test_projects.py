@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from data_project_manager.db.repositories.project import ProjectRepository
+from unittest.mock import patch
+
+from data_project_manager.db.repositories.project import (
+    ProjectRepository,
+    ProjectRootRepository,
+)
 
 
 def test_project_list_empty(client):
@@ -106,6 +111,32 @@ class TestProjectListCapAndToggle:
         r = client.get("/projects/")
         assert b"More \xe2\x86\x92" in r.data
 
+    def test_open_folder_icon_rendered_only_for_rooted_projects(
+        self, client, db_conn, tmp_path
+    ):
+        root = ProjectRootRepository(db_conn).create(
+            name="test-root", absolute_path=str(tmp_path), is_default=True
+        )
+        folder = tmp_path / "2026-04-15-rooted"
+        folder.mkdir()
+        ProjectRepository(db_conn).create(
+            title="Rooted",
+            slug="2026-04-15-rooted",
+            is_adhoc=False,
+            root_id=root.id,
+            relative_path="2026-04-15-rooted",
+        )
+        ProjectRepository(db_conn).create(
+            title="Adhoc", slug="2026-04-15-adhoc", is_adhoc=True
+        )
+
+        r = client.get("/projects/")
+        body = r.data.decode()
+        # One open-folder button for the rooted project, none for adhoc.
+        assert body.count('class="btn-icon open-folder-btn"') == 1
+        assert "/projects/2026-04-15-rooted/open-folder" in body
+        assert "/projects/2026-04-15-adhoc/open-folder" not in body
+
     def test_empty_active_message_when_only_done(self, client, db_conn):
         repo = ProjectRepository(db_conn)
         done = repo.create(
@@ -115,3 +146,82 @@ class TestProjectListCapAndToggle:
 
         r = client.get("/projects/")
         assert b"No active projects" in r.data
+
+
+class TestOpenFolder:
+    """Issue #88: POST /projects/<slug>/open-folder dispatch."""
+
+    def _make_rooted_project(self, db_conn, tmp_path, slug="2026-04-15-demo"):
+        root = ProjectRootRepository(db_conn).create(
+            name="test-root", absolute_path=str(tmp_path), is_default=True
+        )
+        folder = tmp_path / slug
+        folder.mkdir()
+        ProjectRepository(db_conn).create(
+            title="Demo",
+            slug=slug,
+            is_adhoc=False,
+            root_id=root.id,
+            relative_path=slug,
+        )
+        return folder
+
+    def test_dispatches_to_xdg_open_on_linux(self, client, db_conn, tmp_path):
+        folder = self._make_rooted_project(db_conn, tmp_path)
+
+        with (
+            patch("datapm_studio.routes.projects.sys") as mock_sys,
+            patch("datapm_studio.routes.projects.subprocess.Popen") as mock_popen,
+        ):
+            mock_sys.platform = "linux"
+            r = client.post("/projects/2026-04-15-demo/open-folder")
+
+        assert r.status_code == 204
+        mock_popen.assert_called_once()
+        argv = mock_popen.call_args[0][0]
+        assert argv[0] == "xdg-open"
+        assert argv[1] == str(folder.resolve())
+
+    def test_404_for_unknown_slug(self, client):
+        r = client.post("/projects/does-not-exist/open-folder")
+        assert r.status_code == 404
+
+    def test_400_for_adhoc_project_without_folder(self, client, db_conn):
+        ProjectRepository(db_conn).create(
+            title="Adhoc", slug="2026-04-15-adhoc", is_adhoc=True
+        )
+        r = client.post("/projects/2026-04-15-adhoc/open-folder")
+        assert r.status_code == 400
+
+    def test_404_when_folder_missing_on_disk(self, client, db_conn, tmp_path):
+        root = ProjectRootRepository(db_conn).create(
+            name="test-root", absolute_path=str(tmp_path), is_default=True
+        )
+        ProjectRepository(db_conn).create(
+            title="Ghost",
+            slug="2026-04-15-ghost",
+            is_adhoc=False,
+            root_id=root.id,
+            relative_path="2026-04-15-ghost",
+        )
+        r = client.post("/projects/2026-04-15-ghost/open-folder")
+        assert r.status_code == 404
+
+    def test_rejects_path_escape_via_relative_path(self, client, db_conn, tmp_path):
+        root = ProjectRootRepository(db_conn).create(
+            name="test-root",
+            absolute_path=str(tmp_path / "inside"),
+            is_default=True,
+        )
+        (tmp_path / "inside").mkdir()
+        escape_target = tmp_path / "outside"
+        escape_target.mkdir()
+        ProjectRepository(db_conn).create(
+            title="Escape",
+            slug="2026-04-15-escape",
+            is_adhoc=False,
+            root_id=root.id,
+            relative_path="../outside",
+        )
+        r = client.post("/projects/2026-04-15-escape/open-folder")
+        assert r.status_code == 400

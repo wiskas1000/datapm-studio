@@ -644,6 +644,29 @@ body.htmx-request #htmx-progress,
     font-size: 0.9rem;
 }
 
+.slug-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 0.15rem;
+    margin: 0;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 3px;
+}
+
+.btn-icon:hover {
+    color: var(--text);
+    background: var(--bg-hover, rgba(128, 128, 128, 0.15));
+}
+
 .search-filters {
     margin-top: 1rem;
     font-size: 0.9rem;

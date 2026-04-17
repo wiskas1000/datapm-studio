@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from datetime import date
+from pathlib import Path
 from typing import Any
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
 from data_project_manager.core.templates import (
     BUILT_IN_ARCHETYPES,
@@ -276,6 +279,59 @@ def create_project():
 
     flash(f'Created project "{form["title"]}".', "success")
     return redirect(url_for("projects.detail", slug=slug))
+
+
+def _platform_open_command(path: str) -> list[str]:
+    """Return the argv to hand to Popen for opening *path* in the OS file manager."""
+    if sys.platform.startswith("linux"):
+        return ["xdg-open", path]
+    if sys.platform == "darwin":
+        return ["open", path]
+    if sys.platform in ("win32", "cygwin"):
+        return ["explorer", path]
+    raise RuntimeError(f"Unsupported platform: {sys.platform}")
+
+
+@bp.route("/<slug>/open-folder", methods=["POST"])
+def open_folder(slug):
+    """Open a project's folder in the OS file manager.
+
+    Local-only: shells out server-side. See issue #89 (hardening tracker)
+    — this endpoint must be gated off in any networked deployment.
+    """
+    project = _get_repo().get_by_slug(slug)
+    if project is None:
+        abort(404)
+    if not project.root_id or not project.relative_path:
+        abort(400, description="Project has no folder on disk (ad-hoc or unrooted).")
+
+    conn = _get_conn()
+    root = ProjectRootRepository(conn).get(project.root_id)
+    if root is None:
+        abort(400, description="Project root not found.")
+
+    root_abs = Path(root.absolute_path).resolve()
+    folder = (root_abs / project.relative_path).resolve()
+
+    # Defence-in-depth: reject if the resolved folder escapes the root.
+    try:
+        folder.relative_to(root_abs)
+    except ValueError:
+        abort(400, description="Resolved folder escapes its project root.")
+
+    if not folder.is_dir():
+        abort(404, description="Folder does not exist on disk.")
+
+    try:
+        subprocess.Popen(  # noqa: S603 - trusted argv, no shell
+            _platform_open_command(str(folder)),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except FileNotFoundError:
+        abort(500, description="OS file-manager command not found.")
+
+    return "", 204
 
 
 @bp.route("/<slug>")
