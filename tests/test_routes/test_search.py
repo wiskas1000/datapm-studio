@@ -14,6 +14,7 @@ from data_project_manager.db.repositories.person import (
     ProjectPersonRepository,
 )
 from data_project_manager.db.repositories.project import ProjectRepository
+from data_project_manager.db.repositories.tag import ProjectTagRepository, TagRepository
 
 
 def _make_project(conn, *, title, slug, description="", domain=""):
@@ -151,8 +152,9 @@ class TestEnrichment:
         )
         resp = client.get("/search/")
         assert resp.status_code == 200
-        # Should appear exactly once in the row (one chip)
-        assert resp.data.count(b">customer<") == 1
+        # Should appear exactly once as a chip in the result row
+        # (additional occurrences in filter dropdown <option>s are expected)
+        assert resp.data.count(b'class="tag-chip">customer<') == 1
 
 
 class TestResultsStructure:
@@ -178,3 +180,128 @@ class TestResultsStructure:
         resp = client.get("/search/")
         assert resp.status_code == 200
         assert b'href="/projects/linky"' in resp.data
+
+
+class TestMetadataMatch:
+    """Tier 1 metadata substring search surfaces projects whose FTS5
+    columns don't contain the query but whose metadata does."""
+
+    def test_query_matches_tag_name(self, client, db_conn):
+        project = _make_project(db_conn, title="Unrelated Title", slug="unrelated")
+        tag = TagRepository(db_conn).create(name="revenue-forecast")
+        ProjectTagRepository(db_conn).add(project_id=project.id, tag_id=tag.id)
+
+        resp = client.get("/search/?q=revenue-forecast")
+        assert resp.status_code == 200
+        assert b"Unrelated Title" in resp.data
+
+    def test_query_matches_requestor_name(self, client, db_conn):
+        project = _make_project(db_conn, title="Meta Req", slug="meta-req")
+        person = PersonRepository(db_conn).create(
+            first_name="Zelda", last_name="Obscure", email="zo@example.com"
+        )
+        ProjectPersonRepository(db_conn).add(
+            project_id=project.id, person_id=person.id, role="requestor"
+        )
+
+        resp = client.get("/search/?q=zelda")
+        assert resp.status_code == 200
+        assert b"Meta Req" in resp.data
+
+    def test_query_matches_entity_type(self, client, db_conn):
+        project = _make_project(db_conn, title="Etype", slug="etype")
+        df = DataFileRepository(db_conn).create(
+            project_id=project.id, file_path="a.csv"
+        )
+        et = EntityTypeRepository(db_conn).create(name="subscription")
+        DataFileEntityTypeRepository(db_conn).add(
+            data_file_id=df.id, entity_type_id=et.id
+        )
+
+        resp = client.get("/search/?q=subscription")
+        assert resp.status_code == 200
+        assert b"Etype" in resp.data
+
+    def test_fts_and_metadata_results_merged_without_duplicates(self, client, db_conn):
+        """A project that matches both FTS5 and metadata appears once."""
+        project = _make_project(db_conn, title="Customer Work", slug="cust-work")
+        tag = TagRepository(db_conn).create(name="customer-churn")
+        ProjectTagRepository(db_conn).add(project_id=project.id, tag_id=tag.id)
+
+        resp = client.get("/search/?q=customer")
+        assert resp.status_code == 200
+        # The row link appears once per result row
+        assert resp.data.count(b'href="/projects/cust-work"') == 1
+
+
+class TestFilters:
+    """Filter kwargs narrow both result sets uniformly."""
+
+    def test_status_filter_narrows(self, client, db_conn):
+        ProjectRepository(db_conn).create(
+            title="Active A", slug="active-a", status="active"
+        )
+        ProjectRepository(db_conn).create(
+            title="Archived B", slug="arch-b", status="archived"
+        )
+
+        resp = client.get("/search/?status=active")
+        assert resp.status_code == 200
+        assert b"Active A" in resp.data
+        assert b"Archived B" not in resp.data
+
+    def test_tag_filter_requires_all(self, client, db_conn):
+        p1 = _make_project(db_conn, title="Has Both", slug="both")
+        p2 = _make_project(db_conn, title="Has One", slug="one")
+        t_repo = TagRepository(db_conn)
+        pt_repo = ProjectTagRepository(db_conn)
+        tag_a = t_repo.create(name="alpha")
+        tag_b = t_repo.create(name="beta")
+        pt_repo.add(project_id=p1.id, tag_id=tag_a.id)
+        pt_repo.add(project_id=p1.id, tag_id=tag_b.id)
+        pt_repo.add(project_id=p2.id, tag_id=tag_a.id)
+
+        resp = client.get("/search/?tags=alpha&tags=beta")
+        assert resp.status_code == 200
+        assert b"Has Both" in resp.data
+        assert b"Has One" not in resp.data
+
+    def test_requestor_filter_matches_substring(self, client, db_conn):
+        p1 = _make_project(db_conn, title="R One", slug="r-one")
+        p2 = _make_project(db_conn, title="R Two", slug="r-two")
+        person = PersonRepository(db_conn).create(
+            first_name="Alice", last_name="Anderson", email="alice@x.com"
+        )
+        ProjectPersonRepository(db_conn).add(
+            project_id=p1.id, person_id=person.id, role="requestor"
+        )
+        other = PersonRepository(db_conn).create(
+            first_name="Bob", last_name="Baker", email="bob@x.com"
+        )
+        ProjectPersonRepository(db_conn).add(
+            project_id=p2.id, person_id=other.id, role="requestor"
+        )
+
+        resp = client.get("/search/?requestor=alice")
+        assert resp.status_code == 200
+        assert b"R One" in resp.data
+        assert b"R Two" not in resp.data
+
+
+class TestFilterUI:
+    """The search page surfaces filter controls."""
+
+    def test_filter_form_renders(self, client):
+        resp = client.get("/search/")
+        assert resp.status_code == 200
+        for needle in (
+            b'name="status"',
+            b'name="tags"',
+            b'name="entity_types"',
+            b'name="aggregation_levels"',
+            b'name="requestor"',
+            b'name="date_from"',
+            b'name="date_to"',
+            b'name="domain"',
+        ):
+            assert needle in resp.data
