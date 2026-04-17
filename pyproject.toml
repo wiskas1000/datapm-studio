@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = [
-    "data-project-manager",
+    "data-project-manager>=1.2.0",
     "flask>=3.0",
 ]
 

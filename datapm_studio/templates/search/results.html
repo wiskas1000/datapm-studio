@@ -10,16 +10,87 @@
 </div>
 
 <div class="card" style="margin-bottom: 1.5rem;">
-  <form action="{{ url_for('search.search') }}" method="get" class="search-form">
-    <input type="search" name="q" value="{{ query }}" placeholder="Search projects..." autofocus>
-    <button type="submit">Search</button>
+  <form action="{{ url_for('search.search') }}" method="get">
+    <div class="search-form">
+      <input type="search" name="q" value="{{ filters.q }}" placeholder="Search projects..." autofocus>
+      <button type="submit">Search</button>
+    </div>
+
+    <details class="search-filters" {% if filters.any_active and not filters.q %}open{% endif %}>
+      <summary>Filters</summary>
+      <div class="search-filter-grid">
+        <label>
+          Status
+          <select name="status">
+            <option value="">Any</option>
+            {% for s in status_options %}
+            <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>
+          Domain
+          <input type="text" name="domain" value="{{ filters.domain }}">
+        </label>
+
+        <label>
+          Requestor
+          <input type="text" name="requestor" value="{{ filters.requestor }}" placeholder="name or email">
+        </label>
+
+        <label>
+          Created from
+          <input type="date" name="date_from" value="{{ filters.date_from }}">
+        </label>
+
+        <label>
+          Created to
+          <input type="date" name="date_to" value="{{ filters.date_to }}">
+        </label>
+
+        <label>
+          Tags
+          <select name="tags" multiple size="4">
+            {% for name in tag_options %}
+            <option value="{{ name }}" {% if name in filters.tags %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>
+          Entity types
+          <select name="entity_types" multiple size="4">
+            {% for name in entity_type_options %}
+            <option value="{{ name }}" {% if name in filters.entity_types %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>
+          Aggregation levels
+          <select name="aggregation_levels" multiple size="4">
+            {% for name in agg_level_options %}
+            <option value="{{ name }}" {% if name in filters.aggregation_levels %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+
+      <div class="search-filter-actions">
+        <button type="submit">Apply filters</button>
+        <a href="{{ url_for('search.search') }}">Clear</a>
+      </div>
+    </details>
   </form>
 </div>
 
 {% if results %}
 <div class="card">
-  {% if not query %}
+  {% if not filters.any_active %}
   <p class="search-results-heading">All projects ({{ results|length }})</p>
+  {% else %}
+  <p class="search-results-heading">{{ results|length }} result{{ '' if results|length == 1 else 's' }}</p>
   {% endif %}
   <table>
     <thead>
@@ -60,9 +131,9 @@
     </tbody>
   </table>
 </div>
-{% elif query %}
+{% elif filters.any_active %}
 <div class="card card-empty">
-  <p>No results for "{{ query }}".</p>
+  <p>No results{% if filters.q %} for "{{ filters.q }}"{% endif %}.</p>
 </div>
 {% else %}
 <div class="card card-empty">
