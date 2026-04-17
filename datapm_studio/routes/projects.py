@@ -166,6 +166,7 @@ def list_projects():
         limit=PROJECT_LIST_LIMIT,
         truncated=total_count > PROJECT_LIST_LIMIT,
         has_hidden_projects=len(all_projects) > total_count,
+        grand_total=len(all_projects),
     )
 
 

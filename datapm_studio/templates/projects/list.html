@@ -8,10 +8,21 @@
     <div>
       <h1>Projects</h1>
       <p class="subtitle">
-        {% if truncated %}
-          {{ limit }} most recent of {{ total_count }}{% if not include_done %} active{% endif %}
+        {% if include_done %}
+          {% if truncated %}
+            {{ limit }} most recent of {{ total_count }} project{{ '' if total_count == 1 else 's' }}
+          {% else %}
+            {{ total_count }} project{{ '' if total_count == 1 else 's' }}
+          {% endif %}
         {% else %}
-          {{ total_count }}{% if not include_done %} active{% endif %} project{{ '' if total_count == 1 else 's' }}
+          {% if truncated %}
+            {{ limit }} most recent of {{ total_count }} active
+          {% else %}
+            {{ total_count }} active
+          {% endif %}
+          {% if grand_total != total_count %}
+            <span class="subtitle-muted">({{ grand_total }} total)</span>
+          {% endif %}
         {% endif %}
       </p>
     </div>
