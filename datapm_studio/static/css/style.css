@@ -279,7 +279,7 @@ p { margin-bottom: 0.75rem; }
 }
 
 /* Native buttons and submit inputs without .btn class */
-button:not(.btn):not(.theme-toggle):not(.dropdown-item),
+button:not(.btn):not(.theme-toggle):not(.dropdown-item):not(.btn-icon),
 input[type="submit"] {
     display: inline-flex;
     align-items: center;
@@ -296,7 +296,7 @@ input[type="submit"] {
     transition: all 0.15s;
 }
 
-button:not(.btn):not(.theme-toggle):not(.dropdown-item):hover,
+button:not(.btn):not(.theme-toggle):not(.dropdown-item):not(.btn-icon):hover,
 input[type="submit"]:hover {
     background: var(--accent-hover);
 }
