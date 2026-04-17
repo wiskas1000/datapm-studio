@@ -54,7 +54,25 @@
       {% for project in projects %}
       <tr>
         <td><a href="{{ url_for('projects.detail', slug=project.slug) }}">{{ project.title }}</a></td>
-        <td><code>{{ project.slug }}</code></td>
+        <td>
+          <span class="slug-cell">
+            <code>{{ project.slug }}</code>
+            {% if project.root_id and project.relative_path %}
+            <button type="button"
+                    class="btn-icon open-folder-btn"
+                    hx-post="{{ url_for('projects.open_folder', slug=project.slug) }}"
+                    hx-swap="none"
+                    title="Open folder"
+                    aria-label="Open folder in file manager">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                   viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              </svg>
+            </button>
+            {% endif %}
+          </span>
+        </td>
         <td><span class="badge badge-{{ project.status }}">{{ project.status }}</span></td>
         <td>{{ project.created_at[:10] }}</td>
       </tr>
