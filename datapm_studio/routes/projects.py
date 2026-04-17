@@ -136,12 +136,37 @@ def _render_create_form(form: dict, error: str | None = None):
     )
 
 
+PROJECT_LIST_LIMIT = 15
+HIDDEN_STATUSES_BY_DEFAULT = frozenset({"done", "archived"})
+
+
 @bp.route("/")
 def list_projects():
-    """List all projects, most recent first."""
+    """Landing page: 15 most recent projects, hiding done/archived by default.
+
+    Query params:
+        include_done: when truthy, done/archived projects are included.
+    """
+    include_done = request.args.get("include_done") in ("1", "true", "on")
     repo = _get_repo()
-    projects = repo.list()
-    return render_template("projects/list.html", projects=projects)
+    all_projects = repo.list()
+    if not include_done:
+        filtered = [
+            p for p in all_projects if p.status not in HIDDEN_STATUSES_BY_DEFAULT
+        ]
+    else:
+        filtered = all_projects
+    total_count = len(filtered)
+    projects = filtered[:PROJECT_LIST_LIMIT]
+    return render_template(
+        "projects/list.html",
+        projects=projects,
+        include_done=include_done,
+        total_count=total_count,
+        limit=PROJECT_LIST_LIMIT,
+        truncated=total_count > PROJECT_LIST_LIMIT,
+        has_hidden_projects=len(all_projects) > total_count,
+    )
 
 
 @bp.route("/new", methods=["GET", "POST"])

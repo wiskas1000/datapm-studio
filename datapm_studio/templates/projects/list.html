@@ -7,11 +7,26 @@
   <div class="page-header-row">
     <div>
       <h1>Projects</h1>
-      <p class="subtitle">All analytical projects</p>
+      <p class="subtitle">
+        {% if truncated %}
+          {{ limit }} most recent of {{ total_count }}{% if not include_done %} active{% endif %}
+        {% else %}
+          {{ total_count }}{% if not include_done %} active{% endif %} project{{ '' if total_count == 1 else 's' }}
+        {% endif %}
+      </p>
     </div>
     <a href="{{ url_for('projects.create_project') }}" class="btn btn-primary">+ New Project</a>
   </div>
 </div>
+
+<form method="get" action="{{ url_for('projects.list_projects') }}" class="projects-list-toggle">
+  <label>
+    <input type="checkbox" name="include_done" value="1"
+           {% if include_done %}checked{% endif %}
+           onchange="this.form.submit()">
+    Include done &amp; archived
+  </label>
+</form>
 
 {% if projects %}
 <div class="card">
@@ -36,10 +51,19 @@
     </tbody>
   </table>
 </div>
+{% if truncated %}
+<p class="projects-list-more">
+  <a href="{{ url_for('search.search') }}">More →</a>
+</p>
+{% endif %}
 {% else %}
 <div class="card card-empty">
-  <p>No projects yet.</p>
-  <a href="{{ url_for('projects.create_project') }}" class="btn btn-primary">+ New Project</a>
+  {% if has_hidden_projects and not include_done %}
+    <p>No active projects. Tick <em>Include done &amp; archived</em> above to see finished work.</p>
+  {% else %}
+    <p>No projects yet.</p>
+    <a href="{{ url_for('projects.create_project') }}" class="btn btn-primary">+ New Project</a>
+  {% endif %}
 </div>
 {% endif %}
 {% endblock %}
