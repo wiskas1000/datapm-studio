@@ -28,7 +28,14 @@ uv sync
 uv run datapm-studio
 ```
 
-Serves on `http://localhost:5555`. Press Ctrl+C in the terminal to stop.
+Serves on `http://127.0.0.1:5555`. Press Ctrl+C in the terminal to stop.
+
+Override the bind address with `--host` / `--port` if 5555 is taken:
+
+```bash
+uv run datapm-studio --port 5556
+uv run datapm-studio --host 0.0.0.0 --port 8080
+```
 
 ## Architecture
 
